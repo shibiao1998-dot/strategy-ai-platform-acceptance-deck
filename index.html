@@ -131,6 +131,19 @@
       line-height: 1.04;
     }
 
+    .one-line {
+      max-width: none;
+      white-space: nowrap;
+    }
+
+    .one-line.fit {
+      font-size: clamp(40px, 4.4vw, 66px);
+    }
+
+    .one-line.tight {
+      font-size: clamp(38px, 3.8vw, 56px);
+    }
+
     h3 {
       font-size: 24px;
       line-height: 1.34;
@@ -374,6 +387,85 @@
 
     .decision .card { min-height: 230px; }
 
+    .next-layout {
+      display: grid;
+      grid-template-columns: 1.32fr .68fr;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .path-card,
+    .decision-card,
+    .roadmap-item {
+      background: rgba(251, 250, 246, .88);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .path-card,
+    .decision-card {
+      padding: 24px;
+    }
+
+    .path-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .path-step {
+      min-height: 112px;
+      padding: 16px 14px;
+      border-top: 2px solid var(--gold);
+      background: rgba(255, 253, 250, .62);
+    }
+
+    .path-step strong {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--ink);
+      font-size: 17px;
+    }
+
+    .path-step span,
+    .decision-card p,
+    .roadmap-item p {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.52;
+    }
+
+    .decision-card .choice {
+      margin-top: 18px;
+      padding: 16px 0 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .decision-card .choice strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--ink);
+      font-size: 18px;
+    }
+
+    .roadmap-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .roadmap-item {
+      padding: 18px 20px;
+    }
+
+    .roadmap-item strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--ink);
+      font-size: 19px;
+    }
+
     ul {
       margin: 14px 0 0;
       padding-left: 20px;
@@ -491,9 +583,13 @@
       .grid-3,
       .architecture,
       .decision,
+      .next-layout,
+      .path-steps,
+      .roadmap-strip,
       .evidence-grid,
       .metric-row,
       .flow { grid-template-columns: 1fr; }
+      .one-line { white-space: normal; }
       .hero-img { width: 100vw; opacity: .18; }
       .flow .node { min-height: auto; }
     }
@@ -531,7 +627,7 @@
           <div class="card">
             <span class="num">03</span>
             <h3>下一步如何推进</h3>
-            <p>请伟华讨论试点范围、信息源接入方向，并拍板下一阶段是否向“AI+管理”中间层推进。</p>
+            <p>请伟华确定试点范围、信息源接入方向，并拍板下一阶段是否向“AI+管理”中间层推进。</p>
           </div>
         </div>
       </div>
@@ -543,8 +639,8 @@
       <div class="frame architecture">
         <div>
           <div class="kicker">Current Layer</div>
-          <h2>当前产品处在最顶层：项目集输入与战略闭环</h2>
-          <p class="lead">它先把高层会议、行业变化和项目集材料转成项目集战略文档，再把战略变化向下游管理系统传递。</p>
+          <h2>项目集战略闭环</h2>
+          <p class="lead">它先把高层会议、外部信息和项目集材料转成项目集战略文档，再把战略变化向下游管理系统传递。</p>
           <ul>
             <li>第一层：项目集输入与战略闭环，当前已跑通。</li>
             <li>第二层：意图识别与分发 Agent，识别项目集目标、事务类型、风险等级并匹配对应 Agent。</li>
@@ -561,7 +657,7 @@
     <section class="slide">
       <div class="topline"><span>Evidence Base</span><b>输入基座</b></div>
       <div class="frame">
-        <h2>项目集的源材料已经整理完成</h2>
+        <h2 class="one-line fit">项目集的源材料已经整理完成</h2>
         <div class="metric-row">
           <div class="metric">
             <strong>1,673</strong>
@@ -634,7 +730,7 @@
         <div class="grid-2">
           <div>
             <div class="kicker">Human In The Loop</div>
-            <h2>AI 提建议，人做判断</h2>
+            <h2 class="one-line tight">AI 提建议，人做判断</h2>
             <p class="lead">系统设计的关键不是让 AI 越过管理责任，而是把分散信息变成可判断的材料，让负责人把精力放在更高价值的判断上。</p>
           </div>
           <img class="chapter-visual" src="images/generated/chapter-strategy-loop-v1.png" alt="">
@@ -651,12 +747,12 @@
     </section>
 
     <section class="slide">
-      <div class="topline"><span>Discussion</span><b>请伟华讨论</b></div>
+      <div class="topline"><span>Decision</span><b>请伟华总决策</b></div>
       <div class="frame">
-        <h2>讨论一与讨论二：先把试点和信息输入定下来</h2>
+        <h2 class="one-line fit">试点与信息源决策</h2>
         <div class="decision">
           <div class="card">
-            <span class="num">讨论一</span>
+            <span class="num">决策一</span>
             <h3>试点范围怎么定？</h3>
             <p>项目组建议先安排 3-4 个项目集负责人试点，在真实工作中验证使用频率、判断质量和日更价值。</p>
             <ul>
@@ -666,7 +762,7 @@
             </ul>
           </div>
           <div class="card">
-            <span class="num">讨论二</span>
+            <span class="num">决策二</span>
             <h3>信息源是否还要补充？</h3>
             <p>当前已有高层 DJ 会议纪要与外部行业资讯。下一步可能接入财务数据、项目管理数据、行业专家经验输入。</p>
             <ul>
@@ -677,37 +773,43 @@
           </div>
         </div>
       </div>
-      <div class="footer"><span>讨论问题</span><span>07 / 09</span></div>
+      <div class="footer"><span>决策问题</span><span>07 / 09</span></div>
     </section>
 
     <section class="slide">
       <div class="topline"><span>Decision</span><b>请伟华总决策</b></div>
       <div class="frame">
-        <h2>总决策三：下一阶段投入方向</h2>
-        <div class="grid-2">
-          <div class="card">
+        <h2 class="one-line fit">总决策三：下一阶段投入方向</h2>
+        <div class="next-layout">
+          <div class="path-card">
             <span class="num">项目组建议</span>
-            <h3>先让项目集负责人真实使用顶层战略系统</h3>
-            <p>在得到各项目集的顶层战略规划文档后，继续构建中间层：意图识别与分发 Agent，识别项目集目标、事务类型、风险等级，并匹配对应 Agent。</p>
+            <h3>按“顶层先用，中间层再接”的路径推进</h3>
+            <div class="path-steps">
+              <div class="path-step"><strong>01 投入使用</strong><span>先让项目集负责人真实使用顶层战略系统。</span></div>
+              <div class="path-step"><strong>02 沉淀文档</strong><span>形成各项目集的顶层战略规划文档。</span></div>
+              <div class="path-step"><strong>03 建中间层</strong><span>构建意图识别与分发 Agent。</span></div>
+              <div class="path-step"><strong>04 接执行层</strong><span>逐步打通 AI 项目管理与执行交付闭环。</span></div>
+            </div>
           </div>
-          <div class="card">
-            <span class="num">请伟华总判断</span>
+          <div class="decision-card">
+            <span class="num">请伟华总拍板</span>
             <h3>是否认可按此方向推进？</h3>
-            <p>如果认可，项目组按此推进；如果不认可，请伟华总给出更好的建议或目标调整，项目组据此修订下一版本规划。</p>
+            <div class="choice"><strong>认可</strong><p>项目组按此进入下一版本规划与实施。</p></div>
+            <div class="choice"><strong>调整</strong><p>请伟华总给出更优先的方向或目标边界，项目组据此修订。</p></div>
           </div>
         </div>
-        <div class="grid-3">
-          <div class="card">
-            <h3>执行层方向 1</h3>
-            <p>事务分配自动化：事务进入漏斗池后，自动分配给 AI 员工；例如设计事务先交给 AI 设计师。</p>
+        <div class="roadmap-strip">
+          <div class="roadmap-item">
+            <strong>执行层方向 1</strong>
+            <p>事务进入漏斗池后，自动分配给 AI 员工。</p>
           </div>
-          <div class="card">
-            <h3>执行层方向 2</h3>
-            <p>结构化反馈与验收：事务完成后，由 AI 或验收人员形成结构化反馈。</p>
+          <div class="roadmap-item">
+            <strong>执行层方向 2</strong>
+            <p>事务完成后，由 AI 或验收人员形成结构化反馈。</p>
           </div>
-          <div class="card">
-            <h3>执行层方向 3</h3>
-            <p>周验收、月验收、阶段目标验收逐级回流，最终反馈到顶层战略系统。</p>
+          <div class="roadmap-item">
+            <strong>执行层方向 3</strong>
+            <p>周验收、月验收、阶段目标验收逐级回流。</p>
           </div>
         </div>
       </div>
@@ -719,14 +821,14 @@
       <div class="frame grid-2">
         <div>
           <div class="kicker">HD Manual</div>
-          <h2>完整操作流程放在外部产品手册</h2>
+          <h2>请打开产品手册查看完整流程</h2>
           <a class="big-link" href="#" data-href="manual/index.html" target="_blank" rel="noopener">打开产品使用手册</a>
         </div>
         <div>
           <a class="arch-figure zoom-trigger" href="#" data-asset="manual/images/generated/manual-cover-v1.png" data-zoom-src="manual/images/generated/manual-cover-v1.png" aria-label="放大查看产品使用手册封面">
             <img class="manual-cover" data-asset="manual/images/generated/manual-cover-v1.png" alt="产品使用手册封面">
           </a>
-          <p class="caption">手册内所有产品截图均来自本地隔离环境，点击截图可放大查看。</p>
+          <p class="caption">产品截图均来自测试数据，并非正式数据；点击截图可放大查看。</p>
         </div>
       </div>
       <div class="footer"><span>附录入口</span><span>09 / 09</span></div>

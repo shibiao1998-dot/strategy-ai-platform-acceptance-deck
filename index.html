@@ -144,6 +144,13 @@
       line-height: 1.58;
     }
 
+    .cover .lead {
+      max-width: none;
+      white-space: nowrap;
+      font-size: clamp(20px, 1.55vw, 26px);
+      line-height: 1.45;
+    }
+
     .kicker {
       color: var(--gold);
       font-size: 13px;
@@ -226,18 +233,22 @@
     }
 
     .shot {
+      display: block;
       overflow: hidden;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--white);
+      color: inherit;
+      text-decoration: none;
     }
 
     .shot img {
       display: block;
       width: 100%;
-      aspect-ratio: 16 / 8.4;
-      object-fit: cover;
-      object-position: top left;
+      aspect-ratio: 16 / 9;
+      object-fit: contain;
+      object-position: center;
+      background: #f7f4ec;
     }
 
     .shot p {
@@ -264,26 +275,15 @@
       z-index: 1;
     }
 
-    .tag-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .tag {
-      padding: 9px 12px;
-      border: 1px solid rgba(180, 139, 82, .42);
-      background: rgba(255, 253, 250, .62);
-      color: var(--ink);
-      border-radius: 999px;
-      font-size: 15px;
-    }
-
     .architecture {
       display: grid;
-      grid-template-columns: .78fr 1.22fr;
-      gap: 26px;
+      grid-template-columns: .58fr 1.42fr;
+      gap: 30px;
       align-items: center;
+    }
+
+    .architecture h2 {
+      font-size: clamp(42px, 4.8vw, 66px);
     }
 
     .architecture img,
@@ -296,9 +296,46 @@
     }
 
     .architecture img {
-      max-height: 600px;
+      max-height: 720px;
       object-fit: contain;
-      padding: 10px;
+      padding: 6px;
+    }
+
+    .arch-figure,
+    .zoom-trigger {
+      position: relative;
+      cursor: zoom-in;
+    }
+
+    .arch-figure {
+      display: block;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .zoom-trigger::after {
+      content: "点击放大";
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      z-index: 3;
+      padding: 5px 9px;
+      border: 1px solid rgba(180, 139, 82, .55);
+      border-radius: 999px;
+      background: rgba(251, 250, 246, .9);
+      color: var(--ink);
+      font-size: 12px;
+      letter-spacing: .06em;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity .18s ease, transform .18s ease;
+      pointer-events: none;
+    }
+
+    .zoom-trigger:hover::after,
+    .zoom-trigger:focus-visible::after {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .flow {
@@ -388,11 +425,68 @@
       background: var(--ink);
     }
 
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      place-items: center;
+      padding: 42px;
+      background: rgba(6, 27, 52, .78);
+      backdrop-filter: blur(8px);
+    }
+
+    .lightbox.open {
+      display: grid;
+    }
+
+    .lightbox img {
+      display: block;
+      max-width: 96vw;
+      max-height: 88vh;
+      object-fit: contain;
+      background: var(--paper-soft);
+      border: 1px solid rgba(255, 253, 250, .38);
+      border-radius: 8px;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, .32);
+    }
+
+    .lightbox-close,
+    .lightbox-open {
+      position: fixed;
+      z-index: 51;
+      border: 1px solid rgba(255, 253, 250, .42);
+      background: rgba(251, 250, 246, .92);
+      color: var(--ink);
+      text-decoration: none;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .lightbox-close {
+      top: 24px;
+      right: 28px;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .lightbox-open {
+      right: 84px;
+      bottom: 28px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      font-size: 14px;
+    }
+
     @media (max-width: 980px) {
       .slide { padding: 38px 28px 66px; overflow-y: auto; }
       .slide::before { inset: 14px; }
       .frame { height: auto; min-height: calc(100vh - 140px); }
       .footer { left: 28px; right: 28px; }
+      .cover .lead { white-space: normal; }
       .grid-2,
       .grid-3,
       .architecture,
@@ -415,11 +509,6 @@
         <div class="kicker">Executive Acceptance Deck</div>
         <h1>顶层战略 Agent 验收 1.0</h1>
         <p class="lead">请伟华验收：系统是否已经形成可用闭环，并确定下一阶段的推进方向。</p>
-        <div class="tag-row">
-          <span class="tag">本地隔离环境重跑完整流程</span>
-          <span class="tag">1,673 篇会议纪要证据基座</span>
-          <span class="tag">10 份项目集战略文档</span>
-        </div>
       </div>
       <div class="footer"><span>验收汇报</span><span>01 / 09</span></div>
     </section>
@@ -445,7 +534,6 @@
             <p>请伟华讨论试点范围、信息源接入方向，并拍板下一阶段是否向“AI+管理”中间层推进。</p>
           </div>
         </div>
-        <p class="note">本次不把所有答案写死，重点是把已跑通的事实讲清楚，并把需要伟华判断的位置留出来。</p>
       </div>
       <div class="footer"><span>验收范围</span><span>02 / 09</span></div>
     </section>
@@ -463,7 +551,9 @@
             <li>第三层：AI 项目集管理闭环与 AI 执行交付闭环，后续逐步打通。</li>
           </ul>
         </div>
-        <img src="images/transaction-ai-vs-ai-management.png" alt="事务加 AI 与 AI 加管理模式对比流程图">
+        <a class="arch-figure zoom-trigger" href="images/transaction-ai-vs-ai-management.png" data-zoom-src="images/transaction-ai-vs-ai-management.png" aria-label="放大查看 AI 管理流程图">
+          <img src="images/transaction-ai-vs-ai-management.png" alt="事务加 AI 与 AI 加管理模式对比流程图">
+        </a>
       </div>
       <div class="footer"><span>整体架构</span><span>03 / 09</span></div>
     </section>
@@ -471,7 +561,7 @@
     <section class="slide">
       <div class="topline"><span>Evidence Base</span><b>输入基座</b></div>
       <div class="frame">
-        <h2>核心证据基座已经形成</h2>
+        <h2>项目集的源材料已经整理完成</h2>
         <div class="metric-row">
           <div class="metric">
             <strong>1,673</strong>
@@ -509,30 +599,30 @@
       <div class="frame">
         <h2>两个核心闭环已经跑通</h2>
         <div class="evidence-grid">
-          <div class="shot">
-            <img src="../screenshots-hd/01-dashboard.png" alt="仪表盘截图">
+          <a class="shot zoom-trigger" href="#" data-asset="screenshots-hd/01-dashboard.png" data-zoom-src="screenshots-hd/01-dashboard.png" aria-label="放大查看仪表盘截图">
+            <img data-asset="screenshots-hd/01-dashboard.png" alt="仪表盘截图">
             <p>仪表盘：先看战略文档、构建进度和日更状态。</p>
-          </div>
-          <div class="shot">
-            <img src="../screenshots-hd/11-build-direction.png" alt="方向确认截图">
+          </a>
+          <a class="shot zoom-trigger" href="#" data-asset="screenshots-hd/11-build-direction.png" data-zoom-src="screenshots-hd/11-build-direction.png" aria-label="放大查看方向确认截图">
+            <img data-asset="screenshots-hd/11-build-direction.png" alt="方向确认截图">
             <p>0-1 构建：AI 拆出方向，用户逐层确认。</p>
-          </div>
-          <div class="shot">
-            <img src="../screenshots-hd/14-build-expert-review.png" alt="专家评审截图">
+          </a>
+          <a class="shot zoom-trigger" href="#" data-asset="screenshots-hd/14-build-expert-review.png" data-zoom-src="screenshots-hd/14-build-expert-review.png" aria-label="放大查看专家评审截图">
+            <img data-asset="screenshots-hd/14-build-expert-review.png" alt="专家评审截图">
             <p>专家复核：多专家讨论后给出建议，不让 AI 单点决策。</p>
-          </div>
-          <div class="shot">
-            <img src="../screenshots-hd/15-build-completed.png" alt="构建完成截图">
+          </a>
+          <a class="shot zoom-trigger" href="#" data-asset="screenshots-hd/15-build-completed.png" data-zoom-src="screenshots-hd/15-build-completed.png" aria-label="放大查看构建完成截图">
+            <img data-asset="screenshots-hd/15-build-completed.png" alt="构建完成截图">
             <p>完成态：从材料到正式战略文档的闭环成立。</p>
-          </div>
-          <div class="shot">
-            <img src="../screenshots-hd/21-daily-update-review.png" alt="日更建议截图">
+          </a>
+          <a class="shot zoom-trigger" href="#" data-asset="screenshots-hd/21-daily-update-review.png" data-zoom-src="screenshots-hd/21-daily-update-review.png" aria-label="放大查看日更建议截图">
+            <img data-asset="screenshots-hd/21-daily-update-review.png" alt="日更建议截图">
             <p>日常更新：新信息转成可采纳、可拒绝、可调整的建议。</p>
-          </div>
-          <div class="shot">
-            <img src="../screenshots-hd/23-daily-decision.png" alt="日更决策截图">
+          </a>
+          <a class="shot zoom-trigger" href="#" data-asset="screenshots-hd/23-daily-decision.png" data-zoom-src="screenshots-hd/23-daily-decision.png" aria-label="放大查看日更决策截图">
+            <img data-asset="screenshots-hd/23-daily-decision.png" alt="日更决策截图">
             <p>日更决策：最终由人确认并回写战略文档。</p>
-          </div>
+          </a>
         </div>
       </div>
       <div class="footer"><span>闭环证据</span><span>05 / 09</span></div>
@@ -630,11 +720,12 @@
         <div>
           <div class="kicker">HD Manual</div>
           <h2>完整操作流程放在外部产品手册</h2>
-          <p class="lead">PPT 正文只保留验收节奏和决策点；系统登录、从 0 到 1 构建、日常动态更新、专家评审等完整操作，放在可点击跳转的高清手册里。</p>
-          <a class="big-link" href="../manual/index.html" target="_blank" rel="noopener">打开产品使用手册</a>
+          <a class="big-link" href="#" data-href="manual/index.html" target="_blank" rel="noopener">打开产品使用手册</a>
         </div>
         <div>
-          <img class="manual-cover" src="../manual/images/generated/manual-cover-v1.png" alt="产品使用手册封面">
+          <a class="arch-figure zoom-trigger" href="#" data-asset="manual/images/generated/manual-cover-v1.png" data-zoom-src="manual/images/generated/manual-cover-v1.png" aria-label="放大查看产品使用手册封面">
+            <img class="manual-cover" data-asset="manual/images/generated/manual-cover-v1.png" alt="产品使用手册封面">
+          </a>
           <p class="caption">手册内所有产品截图均来自本地隔离环境，点击截图可放大查看。</p>
         </div>
       </div>
@@ -644,10 +735,38 @@
 
   <nav class="controls" aria-label="幻灯片导航"></nav>
 
+  <div class="lightbox" role="dialog" aria-modal="true" aria-label="放大查看图片">
+    <button class="lightbox-close" type="button" aria-label="关闭放大图片">×</button>
+    <img alt="">
+    <a class="lightbox-open" href="#" target="_blank" rel="noopener">打开原图</a>
+  </div>
+
   <script>
     const deck = document.querySelector("#deck");
     const slides = Array.from(document.querySelectorAll(".slide"));
     const controls = document.querySelector(".controls");
+    const lightbox = document.querySelector(".lightbox");
+    const lightboxImg = lightbox.querySelector("img");
+    const lightboxOpen = lightbox.querySelector(".lightbox-open");
+    const lightboxClose = lightbox.querySelector(".lightbox-close");
+    const externalPrefix = location.pathname.includes("/ppt/") || location.pathname.endsWith("/ppt") ? "../" : "";
+
+    function assetUrl(path) {
+      if (!path || /^(https?:|data:|blob:|#)/i.test(path)) return path;
+      if (path.startsWith("screenshots-hd/") || path.startsWith("manual/")) return externalPrefix + path;
+      return path;
+    }
+
+    document.querySelectorAll("[data-asset]").forEach((element) => {
+      const resolved = assetUrl(element.dataset.asset);
+      if (element.tagName === "IMG") element.src = resolved;
+      if (element.tagName === "A") element.href = resolved;
+    });
+
+    document.querySelectorAll("[data-href]").forEach((element) => {
+      element.href = assetUrl(element.dataset.href);
+    });
+
     const dots = slides.map((slide, index) => {
       const dot = document.createElement("button");
       dot.className = "dot";
@@ -659,7 +778,7 @@
     });
 
     function activeIndex() {
-      return Math.round(deck.scrollLeft / window.innerWidth);
+      return Math.round(deck.scrollLeft / deck.clientWidth);
     }
 
     function syncDots() {
@@ -672,9 +791,58 @@
       slides[next].scrollIntoView({ behavior: "smooth", inline: "start" });
     }
 
+    function openLightbox(source, alt) {
+      const resolved = assetUrl(source);
+      lightboxImg.src = resolved;
+      lightboxImg.alt = alt || "放大图片";
+      lightboxOpen.href = resolved;
+      lightbox.classList.add("open");
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove("open");
+      lightboxImg.removeAttribute("src");
+    }
+
+    document.querySelectorAll(".zoom-trigger").forEach((trigger) => {
+      trigger.addEventListener("click", (event) => {
+        event.preventDefault();
+        const source = trigger.dataset.zoomSrc || trigger.dataset.asset || trigger.getAttribute("href");
+        const image = trigger.querySelector("img");
+        openLightbox(source, image?.alt || trigger.getAttribute("aria-label"));
+      });
+    });
+
     deck.addEventListener("scroll", () => window.requestAnimationFrame(syncDots), { passive: true });
     window.addEventListener("resize", syncDots);
+    let wheelLocked = false;
+    window.addEventListener("wheel", (event) => {
+      if (lightbox.classList.contains("open")) return;
+
+      const delta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
+      if (Math.abs(delta) < 24) return;
+
+      event.preventDefault();
+      if (wheelLocked) return;
+
+      go(delta > 0 ? 1 : -1);
+      wheelLocked = true;
+      window.setTimeout(() => {
+        wheelLocked = false;
+      }, 560);
+    }, { passive: false });
+
+    lightbox.addEventListener("click", (event) => {
+      if (event.target === lightbox) closeLightbox();
+    });
+    lightboxClose.addEventListener("click", closeLightbox);
     window.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && lightbox.classList.contains("open")) {
+        closeLightbox();
+        return;
+      }
+      if (lightbox.classList.contains("open")) return;
+
       if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " ") go(1);
       if (event.key === "ArrowLeft" || event.key === "PageUp") go(-1);
       if (event.key === "Home") slides[0].scrollIntoView({ behavior: "smooth", inline: "start" });

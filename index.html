@@ -1,1411 +1,686 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>顶层战略Agent验收1.0汇报 · Strategy AI Platform</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@300;400;500;600&family=Noto+Serif+SC:wght@300;400;500;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-<style>
-  :root{
-    /* ============ 主题色 ============
-       切换主题:从 references/themes.md 复制对应的 :root 块
-       整体替换这几行(--ink / --ink-rgb / --paper / --paper-rgb)
-       其他地方散落的 rgba() 都走 var(--ink-rgb) / var(--paper-rgb),无需逐处改 */
-    --ink:#061b34;
-    --ink-rgb:6,27,52;
-    --paper:#f2efe7;
-    --paper-rgb:242,239,231;
-    --paper-tint:#e8e2d6;
-    --ink-tint:#102846;
-    --accent:#b48b52;
-    --accent-rgb:180,139,82;
-    --line-rgb:68,88,111;
-    --shadow-rgb:5,22,42;
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>顶层战略 Agent 验收 1.0</title>
+  <style>
+    :root {
+      --paper: #f2efe7;
+      --paper-soft: #fbfaf6;
+      --ink: #061b34;
+      --muted: #617083;
+      --line: #d8d2c4;
+      --gold: #b48b52;
+      --gold-soft: #e1ceb0;
+      --white: #fffdfa;
+    }
 
-    /* ============ 字体(跨主题固定) ============ */
-    --mono:"IBM Plex Mono",ui-monospace,monospace;
-    --serif-en:"Playfair Display","Source Serif 4",Georgia,serif;
-    --serif-body-en:"Source Serif 4",Georgia,serif;
-    --serif-zh:"Noto Serif SC",source-han-serif-sc,serif;
-    --sans-zh:"Noto Sans SC",source-han-sans-sc,sans-serif;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{width:100%;height:100%;overflow:hidden;background:var(--paper);color:var(--ink);font-family:var(--sans-zh);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+    * { box-sizing: border-box; }
 
-  /* ============ WebGL 双背景 ============ */
-  canvas.bg{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;display:block;transition:opacity 1.2s ease}
-  canvas#bg-light{opacity:0}
-  canvas#bg-dark{opacity:1}
-  body.light-bg canvas#bg-light{opacity:1}
-  body.light-bg canvas#bg-dark{opacity:0}
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
 
-  /* ============ Deck 容器 + 翻页 ============ */
-  /* width: NSLIDES * 100vw，会在 JS 里动态矫正 */
-  #deck{position:fixed;inset:0;width:10000vw;height:100vh;display:flex;flex-wrap:nowrap;transition:transform .9s cubic-bezier(.77,0,.175,1);z-index:10;will-change:transform}
-  .slide{width:100vw;height:100vh;flex:0 0 100vw;position:relative;padding:6.2vh 6vw 9.4vh 6vw;display:flex;flex-direction:column;overflow:hidden;isolation:isolate}
-  .slide.light,
-  .slide.dark{
-    color:var(--ink);
-    background:
-      radial-gradient(circle at 9% 8%, rgba(var(--accent-rgb),.11), transparent 28vw),
-      radial-gradient(circle at 90% 86%, rgba(var(--ink-rgb),.045), transparent 34vw),
-      linear-gradient(135deg, #f7f5ee 0%, var(--paper) 48%, var(--paper-tint) 100%);
-  }
+    body {
+      -webkit-font-smoothing: antialiased;
+      text-rendering: geometricPrecision;
+    }
 
-  /* 默认页：遮罩较厚，保证文字可读 */
-  .slide::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;transition:background .7s ease}
-  .slide.light::before,
-  .slide.dark::before{
-    background:
-      linear-gradient(90deg, rgba(var(--ink-rgb),.038) 0 1px, transparent 1px 100%) 0 0/8.4vw 100%,
-      rgba(var(--paper-rgb),.52);
-    backdrop-filter:blur(2px);
-  }
-  /* Hero 页：遮罩大幅降低，让 WebGL 背景明显透出 */
-  .slide.hero.light::before,
-  .slide.hero.dark::before{
-    background:
-      linear-gradient(90deg, rgba(var(--ink-rgb),.035) 0 1px, transparent 1px 100%) 0 0/8.4vw 100%,
-      rgba(var(--paper-rgb),.18);
-    backdrop-filter:none;
-  }
-  /* Hero 页顶底微弱渐隐，保证 chrome/foot 区域可读 */
-  .slide.hero::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none}
-  .slide.hero.light::after,
-  .slide.hero.dark::after{background:linear-gradient(180deg,rgba(var(--paper-rgb),.35) 0%,rgba(var(--paper-rgb),0) 14%,rgba(var(--paper-rgb),0) 86%,rgba(var(--paper-rgb),.32) 100%)}
+    .deck {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+    }
 
-  /* ============ Magazine chrome：顶部 meta + 底部 foot ============ */
-  .chrome{display:flex;justify-content:space-between;align-items:flex-start;font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;opacity:.7}
-  .chrome .left,.chrome .right{display:flex;gap:2.4em;align-items:center}
-  .chrome .sep{width:40px;height:1px;background:var(--accent);opacity:.7}
-  .foot{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.55}
-  .foot .title{font-family:var(--serif-zh);font-weight:400;letter-spacing:.05em;text-transform:none;opacity:.75;font-size:13px}
+    .deck::-webkit-scrollbar { display: none; }
 
-  .tag{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;padding:6px 14px;border:1px solid currentColor;opacity:.85}
-  .rule{width:100%;height:1px;background:currentColor;opacity:.25;margin:3vh 0}
-  .rule.v{width:1px;height:100%;margin:0}
+    .slide {
+      position: relative;
+      flex: 0 0 100vw;
+      width: 100vw;
+      height: 100vh;
+      scroll-snap-align: start;
+      padding: 58px 68px 68px;
+      background:
+        linear-gradient(90deg, rgba(180, 139, 82, .08), transparent 36%),
+        var(--paper);
+      overflow: hidden;
+    }
 
-  /* ============ 字体规则 ============
-     · 衬线（Noto Serif SC / Playfair）：大标题、重点金句、数字
-     · 非衬线（Noto Sans SC）：正文描述、body、补充说明
-     · 等宽（IBM Plex Mono）：kicker、meta 小标签、foot 右侧
-  */
-  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;opacity:.62;margin-bottom:2.6vh;color:var(--accent)}
-  .display{font-family:var(--serif-en);font-weight:700;font-size:11vw;line-height:.92;letter-spacing:-.025em}
-  .display-zh{font-family:var(--serif-zh);font-weight:700;font-size:7.8vw;line-height:1.04;letter-spacing:-.005em}
-  .h1-zh{font-family:var(--serif-zh);font-weight:700;font-size:4.6vw;line-height:1.12;letter-spacing:-.005em}
-  .h2-zh{font-family:var(--serif-zh);font-weight:600;font-size:3.2vw;line-height:1.2;letter-spacing:0}
-  .h3-zh{font-family:var(--serif-zh);font-weight:500;font-size:1.9vw;line-height:1.35}
-  .body-zh{font-family:var(--sans-zh);font-weight:400;font-size:max(15px,1.22vw);line-height:1.75;opacity:.82;letter-spacing:.01em}
-  .body-serif{font-family:var(--serif-zh);font-weight:400;font-size:max(15px,1.3vw);line-height:1.65;opacity:.88}
-  .lead{font-family:var(--serif-zh);font-weight:400;font-size:clamp(18px,1.42vw,25px);line-height:1.52;opacity:.84}
-  .meta{font-family:var(--mono);font-size:max(11px,.88vw);letter-spacing:.16em;text-transform:uppercase;opacity:.6}
-  .big-num{font-family:var(--serif-en);font-weight:800;font-size:10vw;line-height:.85;letter-spacing:-.03em;font-feature-settings:"tnum"}
-  .mid-num{font-family:var(--serif-en);font-weight:700;font-size:5.5vw;line-height:.88;letter-spacing:-.02em;font-feature-settings:"tnum"}
-  .ghost{font-family:var(--serif-en);font-weight:900;font-size:34vw;line-height:.8;opacity:.06;letter-spacing:-.04em;position:absolute;font-feature-settings:"tnum"}
-  em{font-style:italic;font-family:var(--serif-en)}
-  .en{font-family:var(--serif-en);font-style:italic;font-weight:500}
+    .slide::before {
+      content: "";
+      position: absolute;
+      inset: 28px;
+      border: 1px solid rgba(180, 139, 82, .22);
+      pointer-events: none;
+    }
 
-  /* ============ 布局工具 ============ */
-  .col{display:flex;flex-direction:column;gap:2.4vh}
-  .row{display:flex;align-items:center;gap:3vw}
-  .grid-6{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:4vw 6vw;flex:1;align-content:center;padding:2vh 0}
-  .grid-9{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:3vh 4vw;flex:1;align-content:center}
-  .grid-4{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr);gap:4vh 6vw;flex:1;align-content:center}
-  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:4vw;flex:1;align-content:center}
-  .split{display:grid;grid-template-columns:1fr 1fr;gap:4vw;flex:1;align-items:center}
-  .split-55{display:grid;grid-template-columns:55fr 45fr;gap:5vw;flex:1;align-items:stretch}
-  .fill{flex:1}
-  .center{align-items:center;justify-content:center;text-align:center}
-  .bottom-left{position:absolute;left:6vw;bottom:9vh;max-width:50vw}
-  .bottom-right{position:absolute;right:6vw;bottom:9vh;max-width:50vw;text-align:right}
-  .top-right{position:absolute;right:6vw;top:6vh;text-align:right}
+    .topline,
+    .footer {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
 
-  /* ============ Stat（数字矩阵） ============ */
-  .stat{display:flex;flex-direction:column;gap:1vh;align-items:flex-start}
-  .stat .n{font-family:var(--serif-en);font-weight:800;font-size:8vw;line-height:.88;letter-spacing:-.03em;font-feature-settings:"tnum"}
-  .stat .l{font-family:var(--sans-zh);font-size:max(13px,1.05vw);opacity:.7;margin-top:1vh;font-weight:400;line-height:1.5}
-  .stat .m{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;opacity:.5;margin-bottom:.2vh}
+    .topline span {
+      display: inline-flex;
+      align-items: center;
+      gap: 18px;
+    }
 
-  /* ============ Callout（引用框） ============ */
-  .callout{padding:3vh 2.4vw;border-left:3px solid var(--accent);position:relative;font-family:var(--serif-zh);font-size:clamp(18px,1.28vw,23px);line-height:1.62;opacity:.94;border-radius:0 8px 8px 0}
-  .slide.light .callout{
-    background:linear-gradient(135deg, rgba(255,255,255,.46), rgba(var(--ink-rgb),.045));
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.55), 0 22px 50px -42px rgba(var(--shadow-rgb),.32);
-  }
-  .slide.dark .callout{
-    background:linear-gradient(135deg, rgba(255,255,255,.09), rgba(var(--accent-rgb),.07));
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.10), 0 26px 60px -44px rgba(0,0,0,.62);
-  }
-  .callout .cite{display:block;margin-top:1.6vh;font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
-  .callout .q-big{font-family:var(--serif-zh);font-weight:600;font-size:clamp(21px,1.58vw,30px);line-height:1.48}
+    .topline span::after {
+      content: "";
+      display: inline-block;
+      width: 42px;
+      height: 1px;
+      background: var(--gold);
+      opacity: .72;
+    }
 
-  /* ============ Platform（平台卡） ============ */
-  .plat{display:flex;flex-direction:column;justify-content:flex-end;padding:2vh 0;border-top:1px solid currentColor;border-color:rgba(127,127,127,.35)}
-  .plat .name{font-family:var(--serif-zh);font-weight:700;font-size:1.8vw;margin-bottom:.6vh}
-  .plat .nb{font-family:var(--serif-en);font-weight:700;font-size:3.2vw;letter-spacing:-.02em;line-height:1;font-feature-settings:"tnum"}
-  .plat .sub{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;opacity:.55;margin-top:.6vh}
-  .plat .fill{font-family:var(--sans-zh);font-weight:300;font-size:2.4vw;opacity:.28;letter-spacing:-.01em;line-height:1}
+    .footer {
+      position: absolute;
+      left: 68px;
+      right: 68px;
+      bottom: 36px;
+      z-index: 4;
+    }
 
-  /* ============ Rowline（表格行） ============ */
-  .rowline{display:grid;grid-template-columns:1fr 2fr 1fr;gap:2vw;padding:2.2vh 0;border-top:1px solid currentColor;align-items:center;border-color:rgba(127,127,127,.25)}
-  .rowline:last-child{border-bottom:1px solid currentColor;border-color:rgba(127,127,127,.25)}
-  .rowline .k{font-family:var(--serif-zh);font-weight:700;font-size:1.7vw}
-  .rowline .v{font-family:var(--sans-zh);font-weight:400;font-size:max(14px,1.2vw);opacity:.85;line-height:1.55}
-  .rowline .m{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.6;justify-self:end}
+    .frame {
+      position: relative;
+      z-index: 2;
+      height: calc(100vh - 172px);
+      display: grid;
+      align-content: center;
+      gap: 28px;
+    }
 
-  /* ============ Pillar（支柱卡片） ============ */
-  .pillar{display:flex;flex-direction:column;gap:1.8vh}
-  .pillar .ic{font-family:var(--serif-en);font-style:italic;font-size:2.6vw;opacity:.45;font-weight:400}
-  .pillar .ic svg{width:2.8vw;height:2.8vw;stroke-width:1.2;opacity:.7}
-  .pillar .t{font-family:var(--serif-zh);font-weight:700;font-size:2.4vw;line-height:1.1}
-  .pillar .d{font-family:var(--sans-zh);font-weight:400;font-size:max(14px,1.1vw);opacity:.76;line-height:1.6}
+    h1, h2, h3, p { margin: 0; }
 
-  /* ============ Signature / Highlight ============ */
-  .sign{font-family:var(--serif-en);font-style:italic;font-weight:500;font-size:2vw;opacity:.7}
-  .hi{position:relative;display:inline}
-  .slide.dark .hi::after{content:"";position:absolute;left:-.1em;right:-.1em;bottom:-.05em;height:.28em;background:rgba(var(--paper-rgb),.15);z-index:-1}
-  .slide.light .hi::after{content:"";position:absolute;left:-.1em;right:-.1em;bottom:-.05em;height:.28em;background:rgba(var(--ink-rgb),.08);z-index:-1}
+    h1, h2 {
+      font-family: Georgia, "Times New Roman", "Songti SC", serif;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
 
-  /* ============ Icons（Lucide via CDN） ============ */
-  .ico{width:1em;height:1em;display:inline-block;vertical-align:-.12em;stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
-  .ico-lg,.ico-md,.ico-sm{fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
-  .ico-lg{width:2.6vw;height:2.6vw;stroke-width:1.2;display:inline-block}
-  .ico-md{width:1.8vw;height:1.8vw;stroke-width:1.3;display:inline-block;vertical-align:-.4em}
-  .ico-sm{width:1.1vw;height:1.1vw;stroke-width:1.4;display:inline-block;vertical-align:-.15em;opacity:.7}
+    h1 {
+      max-width: 760px;
+      font-size: clamp(54px, 7vw, 112px);
+      line-height: .96;
+    }
 
-  /* ============ 图片占位（虚线框，提示设计师位置） ============ */
-  .img-slot{border:1.5px dashed rgba(127,127,127,.4);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1vh;padding:2vh 2vw;font-family:var(--mono);font-size:10px;letter-spacing:.28em;text-transform:uppercase;opacity:.55;position:relative;aspect-ratio:16/9;width:100%;max-height:56vh;margin-inline:auto;box-sizing:border-box}
-  .img-slot::before{content:"";position:absolute;inset:8px;border:1px solid currentColor;opacity:.2}
-  .img-slot .plus{font-size:2vw;font-weight:300;opacity:.5;letter-spacing:0}
-  .img-slot .label{position:relative;z-index:2;text-align:center}
-  .img-slot.r-4x3{aspect-ratio:4/3}
-  .img-slot.r-3x2{aspect-ratio:3/2}
-  .img-slot.r-1x1{aspect-ratio:1/1}
+    h2 {
+      max-width: 960px;
+      font-size: clamp(42px, 5.2vw, 78px);
+      line-height: 1.04;
+    }
 
-  /* ============ 图片实填框（关键：固定高度 + 只裁底部） ============
-     重要约束：高度用内联 height:Nvh 精确控制，不要用 aspect-ratio（会撑破布局）
-     object-position:top center 保证严禁裁剪顶部和左右，只裁剪底部
-  */
-  .frame-img{overflow:hidden;position:relative;background:rgba(0,0,0,.04);box-sizing:border-box;width:100%;border-radius:6px}
-  .slide.dark .frame-img{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.12)}
-  .frame-img > img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
-  .frame-img.fit-contain > img{object-fit:contain;object-position:center center}
-  .frame-img.r-16x9{aspect-ratio:16/9;max-height:64vh}
-  .frame-img.r-16x10{aspect-ratio:16/10;max-height:56vh}
-  .frame-img.r-4x3{aspect-ratio:4/3;max-height:56vh}
-  .frame-img.r-3x2{aspect-ratio:3/2;max-height:46vh}
-  .frame-img.r-3x4{aspect-ratio:3/4;max-height:60vh}
-  .frame-img.r-1x1{aspect-ratio:1/1;max-height:50vh}
-  .frame-img.h-16{height:16vh}
-  .frame-img.h-18{height:18vh}
-  .frame-img.h-22{height:22vh}
-  .frame-img.h-26{height:26vh}
-  .frame-img.h-28{height:28vh}
-  .frame-cap{display:flex;justify-content:space-between;align-items:baseline;gap:1vw;margin-top:.8vh;font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;opacity:.72}
-  .frame-cap .pf{font-family:var(--serif-zh);font-weight:600;font-size:max(13px,1vw);letter-spacing:.04em;text-transform:none;opacity:.94}
-  .frame-cap .nb{font-family:var(--serif-en);font-style:italic;font-size:max(15px,1.2vw);letter-spacing:.02em;text-transform:none;opacity:.88}
-  .frame-cap .idx{font-family:var(--mono);opacity:.5}
-  figure.tile{display:flex;flex-direction:column;margin:0;min-width:0}
-  figure.tile > .frame-img{flex:0 0 auto}
+    h3 {
+      font-size: 24px;
+      line-height: 1.34;
+      font-weight: 700;
+    }
 
-  /* ============ 导航 ============ */
-  #nav{position:fixed;left:50%;bottom:2.6vh;transform:translateX(-50%);z-index:30;display:flex;gap:10px;padding:8px 14px;border-radius:999px;background:rgba(6,18,34,.34);border:1px solid rgba(255,255,255,.13);box-shadow:inset 0 1px 0 rgba(255,255,255,.12), 0 18px 45px -30px rgba(0,0,0,.65);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
-  #nav .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.32);cursor:pointer;transition:transform .3s cubic-bezier(.16,1,.3,1), background .3s ease, width .3s ease;border:0;padding:0}
-  #nav .dot:hover{background:rgba(var(--accent-rgb),.78);transform:scale(1.22)}
-  #nav .dot.active{background:rgba(255,255,255,.95);width:22px;border-radius:999px}
-  body.light-bg #nav{background:rgba(255,255,255,.25)}
-  body.light-bg #nav .dot{background:rgba(var(--ink-rgb),.25)}
-  body.light-bg #nav .dot.active{background:rgba(var(--ink-rgb),.9)}
-  #hint{position:fixed;bottom:3vh;right:3vw;z-index:30;font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;opacity:.4;mix-blend-mode:difference;color:#aaa}
+    .lead {
+      max-width: 860px;
+      color: var(--muted);
+      font-size: clamp(20px, 2vw, 30px);
+      line-height: 1.58;
+    }
 
-  /* ============================================================
-     ============ LAYOUTS API · 面向 agent 的类（v2）============
-     所有 layouts.md 中的骨架都基于下面这套命名。
-     如果你在 layouts.md 里看到某个类，它必须在下面有定义。
-     ============================================================ */
+    .kicker {
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+    }
 
-  /* ---------- .frame：每页主内容容器 ---------- */
-  .frame{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
-  /* 当 .frame 同时加了 grid 类时，grid 的 display:grid 覆盖 flex */
-  .frame.grid-2-7-5,
-  .frame.grid-2-6-6,
-  .frame.grid-2-8-4,
-  .frame.grid-3-3,
-  .frame.grid-6{display:grid}
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 26px;
+      align-items: center;
+    }
 
-  /* ---------- 标题层级（API 名称，衬线为主） ---------- */
-  .h-hero{
-    font-family:var(--serif-zh);
-    font-weight:900;
-    font-size:clamp(72px,8.6vw,136px);
-    line-height:.96;
-    letter-spacing:-.01em;
-    text-wrap:balance;
-  }
-  .h-xl{
-    font-family:var(--serif-zh);
-    font-weight:700;
-    font-size:clamp(42px,5.45vw,88px);
-    line-height:1.08;
-    letter-spacing:0;
-    text-wrap:balance;
-  }
-  .h-sub{
-    font-family:var(--serif-zh);
-    font-weight:500;
-    font-size:3.1vw;
-    line-height:1.25;
-    letter-spacing:0;
-    opacity:.7;
-  }
-  .h-md{
-    font-family:var(--serif-zh);
-    font-weight:600;
-    font-size:2.3vw;
-    line-height:1.3;
-  }
-  /* 英文标题专用（Playfair 衬线） */
-  .h-hero-en,.h-xl-en{font-family:var(--serif-en);letter-spacing:-.025em}
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
 
-  /* ---------- lead 引语 ---------- */
-  .lead{
-    font-family:var(--serif-zh);
-    font-weight:400;
-    font-size:1.75vw;
-    line-height:1.5;
-    opacity:.86;
-  }
+    .card {
+      min-height: 150px;
+      padding: 22px 22px 20px;
+      background: rgba(251, 250, 246, .88);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
 
-  /* ---------- meta-row 底部元数据 ---------- */
-  .meta-row{
-    display:flex;
-    gap:1.2em;
-    align-items:baseline;
-    flex-wrap:wrap;
-    font-family:var(--mono);
-    font-size:max(12px,.92vw);
-    letter-spacing:.16em;
-    text-transform:uppercase;
-    opacity:.6;
-  }
+    .card .num {
+      display: block;
+      margin-bottom: 18px;
+      color: var(--gold);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 32px;
+      font-style: italic;
+    }
 
-  /* ---------- stat-card（数据大字报用） ---------- */
-  .stat-card{
-    display:flex;
-    flex-direction:column;
-    gap:.8vh;
-    align-items:flex-start;
-    padding-top:1.6vh;
-    border-top:1px solid currentColor;
-    border-color:rgba(127,127,127,.3);
-    position:relative;
-    min-height:23vh;
-  }
-  .stat-card::before{
-    content:"";
-    position:absolute;
-    top:-1px;
-    left:0;
-    width:32%;
-    height:2px;
-    background:var(--accent);
-    opacity:.72;
-  }
-  .stat-card .stat-label{
-    font-family:var(--mono);
-    font-size:max(10px,.78vw);
-    letter-spacing:.24em;
-    text-transform:uppercase;
-    opacity:.55;
-  }
-  .stat-card .stat-nb{
-    font-family:var(--serif-en);
-    font-weight:800;
-    font-size:clamp(52px,5.2vw,82px);
-    line-height:.9;
-    letter-spacing:-.03em;
-    font-feature-settings:"tnum";
-    margin-top:.4vh;
-    color:var(--accent);
-  }
-  .stat-card .stat-nb .stat-unit{
-    font-family:var(--serif-zh);
-    font-weight:500;
-    font-size:.38em;
-    letter-spacing:0;
-    opacity:.72;
-    margin-left:.14em;
-  }
-  .stat-card .stat-note{
-    font-family:var(--sans-zh);
-    font-weight:400;
-    font-size:clamp(17px,1.12vw,21px);
-    line-height:1.62;
-    opacity:.78;
-    margin-top:.6vh;
-  }
-  /* 当 stat-card 用于 grid-4（2x2），数字适度放大；若页面有标题+引文在上方，可内联 style 覆盖为更小值 */
-  .grid-4 .stat-card .stat-nb{font-size:clamp(52px,5vw,78px)}
-  /* 当只有 3 个，字也可以稍大 */
-  .grid-3 .stat-card .stat-nb{font-size:6.8vw}
+    .card p,
+    .note,
+    .caption,
+    li {
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.58;
+    }
 
-  /* ---------- pipeline（流水线） ---------- */
-  .pipeline-section{
-    margin-top:4.4vh;
-    padding-top:2.8vh;
-    border-top:1px dashed rgba(127,127,127,.32);
-  }
-  .pipeline-section:first-of-type{
-    border-top:0;
-    padding-top:0;
-    margin-top:3vh;
-  }
-  .pipeline-label{
-    font-family:var(--mono);
-    font-size:max(11px,.85vw);
-    letter-spacing:.24em;
-    text-transform:uppercase;
-    opacity:.62;
-    margin-bottom:2.2vh;
-  }
-  .pipeline{
-    display:grid;
-    grid-template-columns:repeat(5,1fr);
-    gap:1.6vw;
-  }
-  .pipeline[data-cols="3"]{grid-template-columns:repeat(3,1fr)}
-  .pipeline[data-cols="4"]{grid-template-columns:repeat(4,1fr)}
-  .pipeline[data-cols="6"]{grid-template-columns:repeat(6,1fr)}
-  .step{
-    display:flex;
-    flex-direction:column;
-    gap:1.05vh;
-    padding-top:1.65vh;
-    border-top:1px solid currentColor;
-    border-color:rgba(127,127,127,.35);
-    position:relative;
-  }
-  .step::before{content:"";position:absolute;top:-1px;left:0;width:28%;height:2px;background:var(--accent);opacity:.62}
-  .step-nb{
-    font-family:var(--serif-en);
-    font-style:italic;
-    font-weight:500;
-    font-size:1.15vw;
-    opacity:.45;
-  }
-  .step-title{
-    font-family:var(--sans-zh);
-    font-weight:700;
-    font-size:clamp(20px,1.55vw,27px);
-    letter-spacing:.01em;
-    line-height:1.2;
-  }
-  .step-desc{
-    font-family:var(--sans-zh);
-    font-weight:400;
-    font-size:clamp(15px,1.02vw,19px);
-    line-height:1.62;
-    opacity:.76;
-  }
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
 
-  /* ---------- 网格（layouts.md 所用） ---------- */
-  /* 这些类独立挂到任何容器上都能生效，不依赖 .frame 复合选择器 */
-  .grid-2-7-5{display:grid;grid-template-columns:7fr 5fr;gap:3vw 4vh;align-items:start}
-  .grid-2-6-6{display:grid;grid-template-columns:1fr 1fr;gap:3vw 4vh;align-items:start}
-  .grid-2-8-4{display:grid;grid-template-columns:8fr 4fr;gap:3vw 4vh;align-items:start}
-  .grid-3-3{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    grid-auto-rows:minmax(0,1fr);
-    gap:2.4vh 2vw;
-  }
-  /* grid-6 已在旧样式里定义为 3x2，这里仅补 align */
+    .metric {
+      padding: 22px 24px;
+      border-top: 2px solid var(--gold);
+      background: rgba(255, 253, 250, .62);
+    }
 
-  /* ---------- 图片 frame-img（layouts.md 主命名） ---------- */
-  /* 在旧样式里已定义，这里补 img-cap 命名别名与增强 */
-  figure.frame-img{margin:0;display:flex;flex-direction:column;min-width:0}
-  .img-cap{
-    display:block;
-    margin-top:.8vh;
-    font-family:var(--mono);
-    font-size:max(10px,.8vw);
-    letter-spacing:.22em;
-    text-transform:uppercase;
-    opacity:.6;
-  }
-  /* callout src 命名别名 */
-  .callout-src{
-    display:block;
-    margin-top:1.6vh;
-    font-family:var(--mono);
-    font-size:11px;
-    letter-spacing:.2em;
-    text-transform:uppercase;
-    opacity:.6;
-  }
+    .metric strong {
+      display: block;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 54px;
+      line-height: 1;
+      color: var(--ink);
+    }
 
-  /* ---------- chrome & foot 补位（layouts.md 简单写法） ---------- */
-  .chrome{font-family:var(--mono);font-size:max(11px,.78vw);letter-spacing:.2em;text-transform:uppercase;opacity:.62}
-  .foot{font-family:var(--mono);font-size:max(11px,.78vw);letter-spacing:.18em;text-transform:uppercase;opacity:.5}
+    .metric span {
+      display: block;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.45;
+    }
 
-  /* ============ 动效系统(Motion One 驱动) ============
-     所有 [data-anim] 元素默认隐藏,进入页面时由 JS 逐个揭示。
-     - cascade(默认):按 DOM 顺序 stagger 120ms 淡入 + y:16→0
-     - hero(hero 页自动):慢一点的 stagger 180ms
-     - quote(含 [data-anim="line"]):逐行 600ms 淡入
-     - directional(含 [data-anim="left|right"]):左→分隔线→右
-     - pipeline(data-animate="pipeline"):Space/→ 手动推进
-     Motion One 没加载成功时(CDN 断 + 本地丢),所有 [data-anim] 会兜底显示。
-  */
-  [data-anim]{opacity:1}
-  body.motion-ready [data-anim]{opacity:0}
-  body.direct-slide.motion-ready [data-anim]{opacity:1!important;transform:none!important}
-  body.motion-ready [data-anim="left"]{transform:translateX(-24px)}
-  body.motion-ready [data-anim="right"]{transform:translateX(24px)}
-  body.motion-ready [data-anim="line"]{opacity:0;transform:translateY(10px)}
-  body.motion-ready [data-animate="pipeline"] [data-anim]{opacity:.15}
+    .evidence-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
 
-  /* ============ Acceptance deck components ============ */
-  .deck-mark{
-    font-family:var(--mono);
-    font-size:max(11px,.84vw);
-    letter-spacing:.18em;
-    text-transform:uppercase;
-    opacity:.68;
-    color:var(--accent);
-  }
-  .tight-copy{
-    font-family:var(--sans-zh);
-    font-size:clamp(18px,1.18vw,22px);
-    line-height:1.68;
-    opacity:.8;
-  }
-  .screen-grid-2{
-    display:grid;
-    grid-template-columns:1.05fr .95fr;
-    gap:2.4vw;
-    flex:1;
-    min-height:0;
-    align-items:start;
-  }
-  .screen-grid-3{
-    display:grid;
-    grid-template-columns:1.08fr .96fr .96fr;
-    gap:1.8vw;
-    flex:1;
-    min-height:0;
-    align-items:start;
-  }
-  .screen-feature{
-    display:grid;
-    grid-template-columns:7fr 5fr;
-    gap:3vw;
-    flex:1;
-    min-height:0;
-    align-items:center;
-  }
-  .screen-feature.reverse{grid-template-columns:5fr 7fr}
-  .shot-frame{
-    border:1px solid rgba(var(--line-rgb),.24);
-    background:
-      linear-gradient(135deg, rgba(255,255,255,.5), rgba(var(--paper-rgb),.18)),
-      rgba(var(--paper-rgb),.68);
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.7),
-      0 28px 64px -46px rgba(var(--shadow-rgb),.58);
-  }
-  .slide.dark .shot-frame{
-    border-color:rgba(255,255,255,.14);
-    background:linear-gradient(135deg, rgba(255,255,255,.10), rgba(var(--accent-rgb),.06));
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.12),
-      0 32px 80px -46px rgba(0,0,0,.76);
-  }
-  .screen-grid-2 .frame-img.fit-contain,
-  .screen-grid-3 .frame-img.fit-contain{
-    height:auto!important;
-    aspect-ratio:2229/1202;
-    max-height:none;
-  }
-  .screen-grid-2 .tile:nth-child(2),
-  .screen-grid-3 .tile:nth-child(2){margin-top:2.6vh}
-  .screen-grid-3 .tile:nth-child(3){margin-top:1.1vh}
-  .tile{
-    transition:transform .45s cubic-bezier(.16,1,.3,1), filter .45s ease;
-  }
-  .tile:hover{transform:translateY(-4px)}
-  .mini-list{
-    display:flex;
-    flex-direction:column;
-    gap:2.35vh;
-    margin-top:2.6vh;
-  }
-  .mini-list .item{
-    display:grid;
-    grid-template-columns:3.2em 1fr;
-    gap:1.2vw;
-    padding:1.9vh 0 0;
-    border-top:1px solid rgba(127,127,127,.25);
-    position:relative;
-  }
-  .mini-list .item::before{
-    content:"";
-    position:absolute;
-    top:-1px;
-    left:0;
-    width:18%;
-    height:1px;
-    background:var(--accent);
-    opacity:.72;
-  }
-  .mini-list .num{
-    font-family:var(--serif-en);
-    font-style:italic;
-    font-size:clamp(20px,1.55vw,26px);
-    color:var(--accent);
-    opacity:.82;
-  }
-  .mini-list .txt{
-    font-family:var(--sans-zh);
-    font-size:clamp(18px,1.16vw,22px);
-    line-height:1.66;
-    opacity:.84;
-  }
-  .scenario-row{
-    display:grid;
-    grid-template-columns:1.1fr 1.8fr 1.6fr;
-    gap:2.4vw;
-    padding:2.75vh 0;
-    border-top:1px solid rgba(127,127,127,.26);
-    align-items:start;
-    position:relative;
-  }
-  .scenario-row::before{content:"";position:absolute;top:-1px;left:0;width:9vw;height:2px;background:var(--accent);opacity:.5}
-  .scenario-row:last-child{border-bottom:1px solid rgba(127,127,127,.26)}
-  .scenario-role{
-    font-family:var(--serif-zh);
-    font-weight:700;
-    font-size:clamp(22px,1.72vw,31px);
-    line-height:1.32;
-  }
-  .scenario-text{
-    font-family:var(--sans-zh);
-    font-size:clamp(17px,1.12vw,22px);
-    line-height:1.68;
-    opacity:.82;
-  }
-  .compare{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:4vw;
-    flex:1;
-    align-items:stretch;
-  }
-  .compare-col{
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    gap:2.5vh;
-    padding:2.2vh 2.2vw 2.4vh 0;
-    border-top:1px solid rgba(127,127,127,.35);
-    position:relative;
-  }
-  .compare-col::before{content:"";position:absolute;top:-1px;left:0;width:26%;height:2px;background:var(--accent);opacity:.68}
-  .compare-title{
-    font-family:var(--serif-zh);
-    font-weight:700;
-    font-size:clamp(28px,2.25vw,40px);
-  }
-  .compare-lines{
-    display:flex;
-    flex-direction:column;
-    gap:1.9vh;
-    font-family:var(--sans-zh);
-    font-size:clamp(18px,1.16vw,23px);
-    line-height:1.66;
-    opacity:.84;
-  }
-  .roadmap{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:1.7vw;
-    margin-top:6vh;
-  }
-  .roadmap-step{
-    min-height:30vh;
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    padding-top:1.8vh;
-    border-top:1px solid rgba(127,127,127,.36);
-    position:relative;
-  }
-  .roadmap-step::before{content:"";position:absolute;top:-1px;left:0;width:32%;height:2px;background:var(--accent);opacity:.72}
-  .roadmap-step .idx{
-    font-family:var(--serif-en);
-    font-style:italic;
-    font-size:1.4vw;
-    color:var(--accent);
-    opacity:.84;
-  }
-  .roadmap-step .title{
-    font-family:var(--serif-zh);
-    font-weight:700;
-    font-size:clamp(23px,1.78vw,32px);
-    line-height:1.28;
-  }
-  .roadmap-step .desc{
-    font-family:var(--sans-zh);
-    font-size:clamp(17px,1.08vw,21px);
-    line-height:1.66;
-    opacity:.82;
-  }
-  .cover-grid{
-    display:grid;
-    grid-template-columns:7fr 5fr;
-    gap:5vw;
-    flex:1;
-    align-items:end;
-  }
-  .cover-note{
-    padding-top:2vh;
-    border-top:1px solid rgba(127,127,127,.35);
-    font-family:var(--sans-zh);
-    font-size:clamp(18px,1.16vw,22px);
-    line-height:1.68;
-    opacity:.82;
-    position:relative;
-  }
-  .cover-note::before{content:"";position:absolute;top:-1px;left:0;width:34%;height:2px;background:var(--accent);opacity:.78}
-  @media (max-width:900px){
-    .screen-grid-2,.screen-grid-3,.screen-feature,.screen-feature.reverse,.compare,.roadmap,.cover-grid{grid-template-columns:1fr}
-    .roadmap{margin-top:3vh}
-  }
+    .shot {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+    }
 
-  /* ---------- 响应式降级 ---------- */
-  @media (max-width:900px){
-    .display{font-size:16vw}
-    .display-zh{font-size:12vw}
-    .h1-zh{font-size:7vw}
-    .h-hero{font-size:14vw}
-    .h-xl{font-size:9vw}
-    .pipeline{grid-template-columns:repeat(2,1fr)}
-    .grid-2-7-5,.grid-2-6-6,.grid-2-8-4{grid-template-columns:1fr}
-  }
-</style>
+    .shot img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 8.4;
+      object-fit: cover;
+      object-position: top left;
+    }
+
+    .shot p {
+      padding: 12px 14px 14px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .hero-img {
+      position: absolute;
+      inset: 0 0 0 auto;
+      width: 58vw;
+      height: 100vh;
+      object-fit: cover;
+      opacity: .34;
+      filter: saturate(.82) contrast(.94);
+    }
+
+    .hero-mask {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, var(--paper) 0%, rgba(242, 239, 231, .96) 44%, rgba(242, 239, 231, .58) 100%);
+      z-index: 1;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .tag {
+      padding: 9px 12px;
+      border: 1px solid rgba(180, 139, 82, .42);
+      background: rgba(255, 253, 250, .62);
+      color: var(--ink);
+      border-radius: 999px;
+      font-size: 15px;
+    }
+
+    .architecture {
+      display: grid;
+      grid-template-columns: .78fr 1.22fr;
+      gap: 26px;
+      align-items: center;
+    }
+
+    .architecture img,
+    .chapter-visual,
+    .manual-cover {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+    }
+
+    .architecture img {
+      max-height: 600px;
+      object-fit: contain;
+      padding: 10px;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .flow .node {
+      min-height: 116px;
+      padding: 16px;
+      background: var(--paper-soft);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .flow strong {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--ink);
+      font-size: 18px;
+    }
+
+    .flow span {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    .decision {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .decision .card { min-height: 230px; }
+
+    ul {
+      margin: 14px 0 0;
+      padding-left: 20px;
+    }
+
+    li + li { margin-top: 8px; }
+
+    .big-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      margin-top: 18px;
+      padding: 14px 22px;
+      background: var(--ink);
+      color: var(--paper-soft);
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .controls {
+      position: fixed;
+      left: 50%;
+      bottom: 26px;
+      z-index: 20;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 7px;
+      padding: 9px 12px;
+      border: 1px solid rgba(216, 210, 196, .7);
+      border-radius: 999px;
+      background: rgba(251, 250, 246, .78);
+      backdrop-filter: blur(10px);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border: 0;
+      border-radius: 999px;
+      background: #c9c2b2;
+      cursor: pointer;
+    }
+
+    .dot.active {
+      width: 26px;
+      background: var(--ink);
+    }
+
+    @media (max-width: 980px) {
+      .slide { padding: 38px 28px 66px; overflow-y: auto; }
+      .slide::before { inset: 14px; }
+      .frame { height: auto; min-height: calc(100vh - 140px); }
+      .footer { left: 28px; right: 28px; }
+      .grid-2,
+      .grid-3,
+      .architecture,
+      .decision,
+      .evidence-grid,
+      .metric-row,
+      .flow { grid-template-columns: 1fr; }
+      .hero-img { width: 100vw; opacity: .18; }
+      .flow .node { min-height: auto; }
+    }
+  </style>
 </head>
 <body>
-
-<canvas id="bg-dark" class="bg"></canvas>
-<canvas id="bg-light" class="bg"></canvas>
-<div id="hint">← → 翻页 · ESC 索引</div>
-
-<div id="deck">
-
-<!-- ============================================================
-     SLIDES 插入区 · 在此处填充所有页面 section
-     每页模板参考 references/page-patterns.md
-     页面组件参考 references/components.md
-     ============================================================ -->
-
-<section class="slide hero light" data-theme="light">
-  <div class="chrome" data-anim>
-    <div class="left"><span>Acceptance 1.0</span><span class="sep"></span><span>Production</span></div>
-    <div class="right"><span>2026.05.12</span></div>
-  </div>
-  <div class="cover-grid">
-    <div data-anim>
-      <div class="deck-mark">Strategy AI Platform</div>
-      <h1 class="h-hero" style="margin-top:2.2vh">顶层战略<br>Agent</h1>
-      <p class="lead" style="margin-top:3vh">验收 1.0 汇报</p>
-    </div>
-    <div class="cover-note" data-anim>
-      面向公司非游业务项目集负责人，将高层会议指导、行业信息、专家审阅和项目集战略规划合到一个动态闭环里。
-      <br><br>
-      生产地址：http://118.196.33.7:3003/dashboard
-    </div>
-  </div>
-  <div class="foot"><span class="title">顶层战略Agent</span><span>01 / 12</span></div>
-</section>
-
-<section class="slide light" data-theme="light">
-  <div class="chrome" data-anim>
-    <div class="left"><span>Executive Summary</span><span class="sep"></span><span>验收范围</span></div>
-    <div class="right"><span>4 Sections</span></div>
-  </div>
-  <div class="frame" style="gap:4vh">
-    <div data-anim>
-      <div class="kicker">What this deck answers</div>
-      <h2 class="h-xl">伟华只需要看清四件事</h2>
-    </div>
-    <div class="grid-4" style="gap:3vh 4vw">
-      <div class="stat-card" data-anim>
-        <div class="stat-label">Product</div>
-        <div class="stat-nb">01</div>
-        <div class="stat-note">产品功能与操作路径</div>
-      </div>
-      <div class="stat-card" data-anim>
-        <div class="stat-label">Scenario</div>
-        <div class="stat-nb">02</div>
-        <div class="stat-note">项目集负责人如何使用</div>
-      </div>
-      <div class="stat-card" data-anim>
-        <div class="stat-label">Value</div>
-        <div class="stat-nb">03</div>
-        <div class="stat-note">释放核心成员精力</div>
-      </div>
-      <div class="stat-card" data-anim>
-        <div class="stat-label">Roadmap</div>
-        <div class="stat-nb">04</div>
-        <div class="stat-note">后续迭代方向</div>
-      </div>
-    </div>
-    <div class="callout" data-anim>
-      <span class="q-big">本次已在生产环境跑通一份 mock 战略文档的完整构建，以及一次“今天的日常更新”闭环。</span>
-      <span class="cite">Evidence: 10 screenshots from production flow</span>
-    </div>
-  </div>
-  <div class="foot"><span class="title">验收证据</span><span>02 / 12</span></div>
-</section>
-
-<section class="slide hero light" data-theme="light">
-  <div class="chrome" data-anim>
-    <div class="left"><span>Product Map</span><span class="sep"></span><span>产品怎么用</span></div>
-    <div class="right"><span>New User Guide</span></div>
-  </div>
-  <div class="frame grid-2-7-5" style="align-items:center">
-    <div data-anim>
-      <div class="kicker">Entry Path</div>
-      <h2 class="h-xl">不是“问答工具”<br>而是一套战略工作台</h2>
-      <p class="lead" style="margin-top:3vh;max-width:48vw">
-        用户进入后，先看当前战略文档和任务状态，再进入构建、日更、专家评审、术语库和用户权限。
-      </p>
-    </div>
-    <div class="mini-list" data-anim>
-      <div class="item"><div class="num">01</div><div class="txt">仪表盘：查看当前战略文档、构建进度、日常更新状态。</div></div>
-      <div class="item"><div class="num">02</div><div class="txt">从 0 到 1 构建：上传材料后，逐步确认方向、维度、观点。</div></div>
-      <div class="item"><div class="num">03</div><div class="txt">专家评审：多专家讨论后给出可采纳建议，不让 AI 单点决策。</div></div>
-      <div class="item"><div class="num">04</div><div class="txt">日常更新：每天对齐新会议和外部变化，由负责人批准后写入战略文档。</div></div>
-      <div class="item"><div class="num">05</div><div class="txt">战略文档与术语库：沉淀可追溯的正式版本，统一业务语言。</div></div>
-    </div>
-  </div>
-  <div class="foot"><span class="title">产品功能介绍</span><span>03 / 12</span></div>
-</section>
-
-<section class="slide light" data-theme="light">
-  <div class="chrome" data-anim>
-    <div class="left"><span>Build Flow</span><span class="sep"></span><span>从 0 到 1</span></div>
-    <div class="right"><span>Human In The Loop</span></div>
-  </div>
-  <div class="frame" style="gap:4vh">
-    <div data-anim>
-      <div class="kicker">Full Build Pipeline</div>
-      <h2 class="h-xl">一份战略文档这样生成</h2>
-      <p class="lead" style="margin-top:2vh;max-width:72vw">AI 负责拆解和汇总，人负责逐步判断。每一层都能批准、拒绝或调整。</p>
-    </div>
-    <div class="pipeline-section" data-anim>
-      <div class="pipeline-label">0 to 1 construction</div>
-      <div class="pipeline" data-cols="6">
-        <div class="step"><div class="step-nb">01</div><div class="step-title">上传资料</div><div class="step-desc">会议纪要、战略材料、项目背景</div></div>
-        <div class="step"><div class="step-nb">02</div><div class="step-title">提炼方向</div><div class="step-desc">形成顶层战略方向</div></div>
-        <div class="step"><div class="step-nb">03</div><div class="step-title">拆解维度</div><div class="step-desc">把方向落到可管理维度</div></div>
-        <div class="step"><div class="step-nb">04</div><div class="step-title">确认观点</div><div class="step-desc">沉淀关键判断和依据</div></div>
-        <div class="step"><div class="step-nb">05</div><div class="step-title">专家评审</div><div class="step-desc">多专家审阅和争议处理</div></div>
-        <div class="step"><div class="step-nb">06</div><div class="step-title">发布文档</div><div class="step-desc">成为可追踪的正式版本</div></div>
-      </div>
-    </div>
-    <div class="callout" data-anim>
-      用户使用重点：只在关键节点做判断，不需要手工整理大量原始资料。
-    </div>
-  </div>
-  <div class="foot"><span class="title">产品功能介绍</span><span>04 / 12</span></div>
-</section>
-
-<section class="slide light" data-theme="light">
-  <div class="chrome" data-anim>
-    <div class="left"><span>Build Screens</span><span class="sep"></span><span>维度与观点确认</span></div>
-    <div class="right"><span>Production Capture</span></div>
-  </div>
-  <div class="frame" style="gap:2.6vh">
-    <div data-anim>
-      <h2 class="h-md">构建阶段：从“战略方向”拆到“可执行观点”</h2>
-      <p class="tight-copy" style="margin-top:1vh">负责人逐条确认，AI 的产出不会直接变成最终战略。</p>
-    </div>
-    <div class="screen-grid-2">
-      <figure class="tile" data-anim>
-        <div class="frame-img shot-frame fit-contain" style="height:58vh"><img src="images/01-build-dimensions.png" alt="维度确认页面"></div>
-        <figcaption class="frame-cap"><span class="pf">确认战略维度</span><span class="idx">01</span></figcaption>
-      </figure>
-      <figure class="tile" data-anim>
-        <div class="frame-img shot-frame fit-contain" style="height:58vh"><img src="images/02-build-viewpoints.png" alt="观点确认页面"></div>
-        <figcaption class="frame-cap"><span class="pf">确认关键观点</span><span class="idx">02</span></figcaption>
-      </figure>
-    </div>
-  </div>
-  <div class="foot"><span class="title">产品功能介绍</span><span>05 / 12</span></div>
-</section>
-
-<section class="slide light" data-theme="light">
-  <div class="chrome" data-anim>
-    <div class="left"><span>Review Screens</span><span class="sep"></span><span>专家评审与发布</span></div>
-    <div class="right"><span>Production Capture</span></div>
-  </div>
-  <div class="frame" style="gap:2.6vh">
-    <div data-anim>
-      <h2 class="h-md">专家评审后，战略文档才进入发布状态</h2>
-      <p class="tight-copy" style="margin-top:1vh">从 AI 初稿到正式版本，中间保留专家意见、最终审阅和完成记录。</p>
-    </div>
-    <div class="screen-grid-3">
-      <figure class="tile" data-anim>
-        <div class="frame-img shot-frame fit-contain" style="height:50vh"><img src="images/03-build-expert-review.png" alt="构建专家评审页面"></div>
-        <figcaption class="frame-cap"><span class="pf">专家讨论</span><span class="idx">03</span></figcaption>
-      </figure>
-      <figure class="tile" data-anim>
-        <div class="frame-img shot-frame fit-contain" style="height:50vh"><img src="images/04-build-final-review.png" alt="最终审阅页面"></div>
-        <figcaption class="frame-cap"><span class="pf">最终审阅</span><span class="idx">04</span></figcaption>
-      </figure>
-      <figure class="tile" data-anim>
-        <div class="frame-img shot-frame fit-contain" style="height:50vh"><img src="images/05-build-completed.png" alt="构建完成页面"></div>
-        <figcaption class="frame-cap"><span class="pf">构建完成</span><span class="idx">05</span></figcaption>
-      </figure>
-    </div>
-  </div>
-  <div class="foot"><span class="title">产品功能介绍</span><span>06 / 12</span></div>
-</section>
-
-<section class="slide hero light" data-theme="light">
-  <div class="chrome" data-anim>
-    <div class="left"><span>Daily Update</span><span class="sep"></span><span>每天动态对齐</span></div>
-    <div class="right"><span>Operational Loop</span></div>
-  </div>
-  <div class="frame grid-2-6-6" style="align-items:center">
-    <div data-anim>
-      <div class="kicker">Continuous Strategy Alignment</div>
-      <h2 class="h-xl">战略不是一次性文档<br>而是每日更新的决策系统</h2>
-    </div>
-    <div class="mini-list" data-anim>
-      <div class="item"><div class="num">01</div><div class="txt">拉取今天相关会议纪要与行业变化。</div></div>
-      <div class="item"><div class="num">02</div><div class="txt">AI 生成候选变更，标明影响的方向、维度或观点。</div></div>
-      <div class="item"><div class="num">03</div><div class="txt">负责人批准、拒绝或调整，保留人工决策权。</div></div>
-      <div class="item"><div class="num">04</div><div class="txt">必要时进入专家复核，再写入正式战略文档。</div></div>
-    </div>
-  </div>
-  <div class="foot"><span class="title">产品功能介绍</span><span>07 / 12</span></div>
-</section>
-
-<section class="slide light" data-theme="light">
-  <div class="chrome" data-anim>
-    <div class="left"><span>Daily Screens</span><span class="sep"></span><span>候选变更审批</span></div>
-    <div class="right"><span>Manual Trigger</span></div>
-  </div>
-  <div class="frame" style="gap:2.6vh">
-    <div data-anim>
-      <h2 class="h-md">今天的日常更新：AI 给出变更建议，人做决策</h2>
-      <p class="tight-copy" style="margin-top:1vh">本次演示包含修改观点、新增维度、新增观点三类变更。</p>
-    </div>
-    <div class="screen-grid-2">
-      <figure class="tile" data-anim>
-        <div class="frame-img shot-frame fit-contain" style="height:58vh"><img src="images/06-daily-update-review.png" alt="日常更新候选变更页面"></div>
-        <figcaption class="frame-cap"><span class="pf">查看候选变更</span><span class="idx">06</span></figcaption>
-      </figure>
-      <figure class="tile" data-anim>
-        <div class="frame-img shot-frame fit-contain" style="height:58vh"><img src="images/07-daily-update-approved.png" alt="日常更新批准页面"></div>
-        <figcaption class="frame-cap"><span class="pf">批准后进入下一步</span><span class="idx">07</span></figcaption>
-      </figure>
-    </div>
-  </div>
-  <div class="foot"><span class="title">产品功能介绍</span><span>08 / 12</span></div>
-</section>
-
-<section class="slide light" data-theme="light">
-  <div class="chrome" data-anim>
-    <div class="left"><span>Decision Screens</span><span class="sep"></span><span>日更闭环</span></div>
-    <div class="right"><span>Versioned Output</span></div>
-  </div>
-  <div class="frame" style="gap:2.6vh">
-    <div data-anim>
-      <h2 class="h-md">日更闭环：变更经过专家审阅后关闭决策</h2>
-      <p class="tight-copy" style="margin-top:1vh">最终结果写入战略文档版本，后续可继续追踪影响。</p>
-    </div>
-    <div class="screen-grid-3">
-      <figure class="tile" data-anim>
-        <div class="frame-img shot-frame fit-contain" style="height:50vh"><img src="images/08-daily-expert-review.png" alt="日常更新专家评审页面"></div>
-        <figcaption class="frame-cap"><span class="pf">专家复核</span><span class="idx">08</span></figcaption>
-      </figure>
-      <figure class="tile" data-anim>
-        <div class="frame-img shot-frame fit-contain" style="height:50vh"><img src="images/09-daily-decision.png" alt="日常更新决策页面"></div>
-        <figcaption class="frame-cap"><span class="pf">关闭决策</span><span class="idx">09</span></figcaption>
-      </figure>
-      <figure class="tile" data-anim>
-        <div class="frame-img shot-frame fit-contain" style="height:50vh"><img src="images/10-daily-completed.png" alt="日常更新完成页面"></div>
-        <figcaption class="frame-cap"><span class="pf">更新完成</span><span class="idx">10</span></figcaption>
-      </figure>
-    </div>
-  </div>
-  <div class="foot"><span class="title">产品功能介绍</span><span>09 / 12</span></div>
-</section>
-
-<section class="slide light" data-theme="light">
-  <div class="chrome" data-anim>
-    <div class="left"><span>User Scenarios</span><span class="sep"></span><span>面向用户使用场景</span></div>
-    <div class="right"><span>Non Game Business</span></div>
-  </div>
-  <div class="frame" style="gap:3.2vh">
-    <div data-anim>
-      <div class="kicker">Who Uses It</div>
-      <h2 class="h-xl">服务三类关键协作对象</h2>
-    </div>
-    <div>
-      <div class="scenario-row" data-anim>
-        <div class="scenario-role">项目集负责人</div>
-        <div class="scenario-text">把过去分散在会议、行业、专家访谈里的战略判断，集中到一个动态文档中。</div>
-        <div class="scenario-text">每天只处理 AI 标出的关键变化，把精力留给战略判断。</div>
-      </div>
-      <div class="scenario-row" data-anim>
-        <div class="scenario-role">公司高层与董办</div>
-        <div class="scenario-text">高层会议指导可以更快沉淀到项目集战略，不停留在会议纪要层面。</div>
-        <div class="scenario-text">能看到项目集是否持续对齐最新战略口径。</div>
-      </div>
-      <div class="scenario-row" data-anim>
-        <div class="scenario-role">AI项目管理Agent集群</div>
-        <div class="scenario-text">顶层规划变更不止写进文档，还能向项目层传递影响。</div>
-        <div class="scenario-text">后续可自动触发子项目启停、关键事务变更和资源优先级调整。</div>
-      </div>
-    </div>
-  </div>
-  <div class="foot"><span class="title">用户使用场景</span><span>10 / 12</span></div>
-</section>
-
-<section class="slide light" data-theme="light">
-  <div class="chrome" data-anim>
-    <div class="left"><span>Business Value</span><span class="sep"></span><span>带来的价值</span></div>
-    <div class="right"><span>Work Mode Change</span></div>
-  </div>
-  <div class="frame" style="gap:4vh">
-    <div data-anim>
-      <div class="kicker">Before And After</div>
-      <h2 class="h-xl">价值不是多一个工具<br>而是改变项目集负责人的工作方式</h2>
-    </div>
-    <div class="compare">
-      <div class="compare-col" data-anim>
-        <div class="deck-mark">Past Mode</div>
-        <div class="compare-title">负责人自己追信息</div>
-        <div class="compare-lines">
-          <div>频繁关注高层战略调整。</div>
-          <div>从多渠道追踪行业和市场变化。</div>
-          <div>再找专家确认判断，最后手工调整规划。</div>
+  <main class="deck" id="deck" aria-label="顶层战略 Agent 验收 1.0">
+    <section class="slide cover">
+      <img class="hero-img" src="images/generated/cover-v1.png" alt="">
+      <div class="hero-mask"></div>
+      <div class="topline"><span>Acceptance 1.0</span><b>顶层战略 Agent</b></div>
+      <div class="frame">
+        <div class="kicker">Executive Acceptance Deck</div>
+        <h1>顶层战略 Agent 验收 1.0</h1>
+        <p class="lead">请伟华验收：系统是否已经形成可用闭环，并确定下一阶段的推进方向。</p>
+        <div class="tag-row">
+          <span class="tag">本地隔离环境重跑完整流程</span>
+          <span class="tag">1,673 篇会议纪要证据基座</span>
+          <span class="tag">10 份项目集战略文档</span>
         </div>
       </div>
-      <div class="compare-col" data-anim>
-        <div class="deck-mark">Agent Mode</div>
-        <div class="compare-title">AI 聚合，人做判断</div>
-        <div class="compare-lines">
-          <div>每日自动汇总变化和影响点。</div>
-          <div>多渠道信息和多专家审阅先完成。</div>
-          <div>负责人只对“是否采纳”做高价值决策。</div>
+      <div class="footer"><span>验收汇报</span><span>01 / 09</span></div>
+    </section>
+
+    <section class="slide">
+      <div class="topline"><span>What To Accept</span><b>本场节奏</b></div>
+      <div class="frame">
+        <h2>今天请伟华验收三件事</h2>
+        <div class="grid-3">
+          <div class="card">
+            <span class="num">01</span>
+            <h3>系统闭环是否成立</h3>
+            <p>从 0 到 1 构建、日常动态更新、专家复核与人工判断，是否已经构成可演示的完整闭环。</p>
+          </div>
+          <div class="card">
+            <span class="num">02</span>
+            <h3>角色边界是否正确</h3>
+            <p>AI 负责汇总、拆解、生成建议与复核依据；人保留采纳、拒绝、调整和发布的最终判断。</p>
+          </div>
+          <div class="card">
+            <span class="num">03</span>
+            <h3>下一步如何推进</h3>
+            <p>请伟华讨论试点范围、信息源接入方向，并拍板下一阶段是否向“AI+管理”中间层推进。</p>
+          </div>
+        </div>
+        <p class="note">本次不把所有答案写死，重点是把已跑通的事实讲清楚，并把需要伟华判断的位置留出来。</p>
+      </div>
+      <div class="footer"><span>验收范围</span><span>02 / 09</span></div>
+    </section>
+
+    <section class="slide">
+      <div class="topline"><span>AI + Management</span><b>系统位置</b></div>
+      <div class="frame architecture">
+        <div>
+          <div class="kicker">Current Layer</div>
+          <h2>当前产品处在最顶层：项目集输入与战略闭环</h2>
+          <p class="lead">它先把高层会议、行业变化和项目集材料转成项目集战略文档，再把战略变化向下游管理系统传递。</p>
+          <ul>
+            <li>第一层：项目集输入与战略闭环，当前已跑通。</li>
+            <li>第二层：意图识别与分发 Agent，识别项目集目标、事务类型、风险等级并匹配对应 Agent。</li>
+            <li>第三层：AI 项目集管理闭环与 AI 执行交付闭环，后续逐步打通。</li>
+          </ul>
+        </div>
+        <img src="images/transaction-ai-vs-ai-management.png" alt="事务加 AI 与 AI 加管理模式对比流程图">
+      </div>
+      <div class="footer"><span>整体架构</span><span>03 / 09</span></div>
+    </section>
+
+    <section class="slide">
+      <div class="topline"><span>Evidence Base</span><b>输入基座</b></div>
+      <div class="frame">
+        <h2>核心证据基座已经形成</h2>
+        <div class="metric-row">
+          <div class="metric">
+            <strong>1,673</strong>
+            <span>篇会议纪要已完成项目相关性蒸馏，覆盖 2025-01-01 至 2026-05-13。</span>
+          </div>
+          <div class="metric">
+            <strong>10</strong>
+            <span>份项目集战略文档进入系统，构成独立战略空间。</span>
+          </div>
+          <div class="metric">
+            <strong>2</strong>
+            <span>类信息源已接入方向：高层 DJ 会议纪要与外部行业资讯。</span>
+          </div>
+        </div>
+        <div class="grid-3">
+          <div class="card">
+            <h3>输入可追溯</h3>
+            <p>每个观点都应能回到具体会议、行业资讯或专家建议，避免战略文档变成不可追问的摘要。</p>
+          </div>
+          <div class="card">
+            <h3>更新可持续</h3>
+            <p>新会议与外部变化可以持续进入日常更新流程，推动战略文档动态变化。</p>
+          </div>
+          <div class="card">
+            <h3>空间可扩展</h3>
+            <p>每个项目集形成独立战略空间，后续可汇总为非游业务整体战略文档。</p>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="callout" data-anim>
-      释放项目集负责人这类核心成员的精力，让他们少做资料搬运，多做战略思考。
-    </div>
-  </div>
-  <div class="foot"><span class="title">业务价值</span><span>11 / 12</span></div>
-</section>
+      <div class="footer"><span>证据基座</span><span>04 / 09</span></div>
+    </section>
 
-<section class="slide hero light" data-theme="light">
-  <div class="chrome" data-anim>
-    <div class="left"><span>Roadmap</span><span class="sep"></span><span>后续功能迭代方向</span></div>
-    <div class="right"><span>Next Version</span></div>
-  </div>
-  <div class="frame">
-    <div data-anim>
-      <div class="kicker">From Program Strategy To Company Strategy</div>
-      <h2 class="h-xl">下一步：把项目集战略汇成非游整体战略</h2>
-      <p class="lead" style="margin-top:2vh;max-width:72vw">
-        从单个项目集的动态规划，升级为公司非游业务的整体战略认知底座。
-      </p>
-    </div>
-    <div class="roadmap">
-      <div class="roadmap-step">
-        <div class="idx">01</div>
-        <div class="title">战略文档汇总</div>
-        <div class="desc">汇总各项目集负责人维护的战略方向文档。</div>
+    <section class="slide">
+      <div class="topline"><span>Closed Loops</span><b>系统闭环</b></div>
+      <div class="frame">
+        <h2>两个核心闭环已经跑通</h2>
+        <div class="evidence-grid">
+          <div class="shot">
+            <img src="../screenshots-hd/01-dashboard.png" alt="仪表盘截图">
+            <p>仪表盘：先看战略文档、构建进度和日更状态。</p>
+          </div>
+          <div class="shot">
+            <img src="../screenshots-hd/11-build-direction.png" alt="方向确认截图">
+            <p>0-1 构建：AI 拆出方向，用户逐层确认。</p>
+          </div>
+          <div class="shot">
+            <img src="../screenshots-hd/14-build-expert-review.png" alt="专家评审截图">
+            <p>专家复核：多专家讨论后给出建议，不让 AI 单点决策。</p>
+          </div>
+          <div class="shot">
+            <img src="../screenshots-hd/15-build-completed.png" alt="构建完成截图">
+            <p>完成态：从材料到正式战略文档的闭环成立。</p>
+          </div>
+          <div class="shot">
+            <img src="../screenshots-hd/21-daily-update-review.png" alt="日更建议截图">
+            <p>日常更新：新信息转成可采纳、可拒绝、可调整的建议。</p>
+          </div>
+          <div class="shot">
+            <img src="../screenshots-hd/23-daily-decision.png" alt="日更决策截图">
+            <p>日更决策：最终由人确认并回写战略文档。</p>
+          </div>
+        </div>
       </div>
-      <div class="roadmap-step">
-        <div class="idx">02</div>
-        <div class="title">整体战略生成</div>
-        <div class="desc">形成非游业务整体战略文档，供顶层规划参考。</div>
+      <div class="footer"><span>闭环证据</span><span>05 / 09</span></div>
+    </section>
+
+    <section class="slide">
+      <div class="topline"><span>Governance</span><b>权限边界</b></div>
+      <div class="frame">
+        <div class="grid-2">
+          <div>
+            <div class="kicker">Human In The Loop</div>
+            <h2>AI 提建议，人做判断</h2>
+            <p class="lead">系统设计的关键不是让 AI 越过管理责任，而是把分散信息变成可判断的材料，让负责人把精力放在更高价值的判断上。</p>
+          </div>
+          <img class="chapter-visual" src="images/generated/chapter-strategy-loop-v1.png" alt="">
+        </div>
+        <div class="flow">
+          <div class="node"><strong>多源输入</strong><span>会议纪要、行业资讯、项目材料进入系统。</span></div>
+          <div class="node"><strong>AI 拆解</strong><span>提炼方向、维度、观点和风险变化。</span></div>
+          <div class="node"><strong>专家复核</strong><span>多专家给出争议点和可采纳建议。</span></div>
+          <div class="node"><strong>人工判断</strong><span>负责人采纳、拒绝、调整或发布。</span></div>
+          <div class="node"><strong>版本回写</strong><span>形成可追溯战略文档和后续影响。</span></div>
+        </div>
       </div>
-      <div class="roadmap-step">
-        <div class="idx">03</div>
-        <div class="title">项目管理联动</div>
-        <div class="desc">打通 AI 项目管理 Agent 集群，传递规划变化。</div>
+      <div class="footer"><span>边界设计</span><span>06 / 09</span></div>
+    </section>
+
+    <section class="slide">
+      <div class="topline"><span>Discussion</span><b>请伟华讨论</b></div>
+      <div class="frame">
+        <h2>讨论一与讨论二：先把试点和信息输入定下来</h2>
+        <div class="decision">
+          <div class="card">
+            <span class="num">讨论一</span>
+            <h3>试点范围怎么定？</h3>
+            <p>项目组建议先安排 3-4 个项目集负责人试点，在真实工作中验证使用频率、判断质量和日更价值。</p>
+            <ul>
+              <li>保守：1-2 个负责人小范围测试。</li>
+              <li>推荐：3-4 个负责人形成横向对比。</li>
+              <li>激进：10 个项目组一次性接入。</li>
+            </ul>
+          </div>
+          <div class="card">
+            <span class="num">讨论二</span>
+            <h3>信息源是否还要补充？</h3>
+            <p>当前已有高层 DJ 会议纪要与外部行业资讯。下一步可能接入财务数据、项目管理数据、行业专家经验输入。</p>
+            <ul>
+              <li>请伟华先判断这些方向是否认可。</li>
+              <li>如认可，再安排优先级与接入边界。</li>
+              <li>如有更关键的信息源，请现场补充。</li>
+            </ul>
+          </div>
+        </div>
       </div>
-      <div class="roadmap-step">
-        <div class="idx">04</div>
-        <div class="title">执行自动影响</div>
-        <div class="desc">自动影响子项目启停、关键事务变更和资源优先级。</div>
+      <div class="footer"><span>讨论问题</span><span>07 / 09</span></div>
+    </section>
+
+    <section class="slide">
+      <div class="topline"><span>Decision</span><b>请伟华总决策</b></div>
+      <div class="frame">
+        <h2>总决策三：下一阶段投入方向</h2>
+        <div class="grid-2">
+          <div class="card">
+            <span class="num">项目组建议</span>
+            <h3>先让项目集负责人真实使用顶层战略系统</h3>
+            <p>在得到各项目集的顶层战略规划文档后，继续构建中间层：意图识别与分发 Agent，识别项目集目标、事务类型、风险等级，并匹配对应 Agent。</p>
+          </div>
+          <div class="card">
+            <span class="num">请伟华总判断</span>
+            <h3>是否认可按此方向推进？</h3>
+            <p>如果认可，项目组按此推进；如果不认可，请伟华总给出更好的建议或目标调整，项目组据此修订下一版本规划。</p>
+          </div>
+        </div>
+        <div class="grid-3">
+          <div class="card">
+            <h3>执行层方向 1</h3>
+            <p>事务分配自动化：事务进入漏斗池后，自动分配给 AI 员工；例如设计事务先交给 AI 设计师。</p>
+          </div>
+          <div class="card">
+            <h3>执行层方向 2</h3>
+            <p>结构化反馈与验收：事务完成后，由 AI 或验收人员形成结构化反馈。</p>
+          </div>
+          <div class="card">
+            <h3>执行层方向 3</h3>
+            <p>周验收、月验收、阶段目标验收逐级回流，最终反馈到顶层战略系统。</p>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-  <div class="foot"><span class="title">迭代方向</span><span>12 / 12</span></div>
-</section>
+      <div class="footer"><span>下一阶段</span><span>08 / 09</span></div>
+    </section>
 
-</div>
+    <section class="slide">
+      <div class="topline"><span>Appendix</span><b>产品手册</b></div>
+      <div class="frame grid-2">
+        <div>
+          <div class="kicker">HD Manual</div>
+          <h2>完整操作流程放在外部产品手册</h2>
+          <p class="lead">PPT 正文只保留验收节奏和决策点；系统登录、从 0 到 1 构建、日常动态更新、专家评审等完整操作，放在可点击跳转的高清手册里。</p>
+          <a class="big-link" href="../manual/index.html" target="_blank" rel="noopener">打开产品使用手册</a>
+        </div>
+        <div>
+          <img class="manual-cover" src="../manual/images/generated/manual-cover-v1.png" alt="产品使用手册封面">
+          <p class="caption">手册内所有产品截图均来自本地隔离环境，点击截图可放大查看。</p>
+        </div>
+      </div>
+      <div class="footer"><span>附录入口</span><span>09 / 09</span></div>
+    </section>
+  </main>
 
-<div id="nav"></div>
+  <nav class="controls" aria-label="幻灯片导航"></nav>
 
-<script>
-/* =============== WebGL 双背景 ===============
-   深色页：Holographic Dispersion（全息色散 · 钛金暗流）—— 彩虹微扰、鼠标径向涟漪
-   浅色页：Spiral Vortex（旋转涡流 · 银色珍珠）—— domain-warp 流动、无中心
-   修改风格请参考 references/webgl-backgrounds.md
-*/
-const VS = `attribute vec2 position;void main(){gl_Position=vec4(position,0.0,1.0);}`;
-
-const FS_DARK = `precision highp float;
-uniform vec2 u_resolution;uniform float u_time;uniform vec2 u_mouse;
-vec3 palette(float t,vec3 a,vec3 b,vec3 c,vec3 d){return a+b*cos(6.28318*(c*t+d));}
-void main(){
-  vec2 uv=gl_FragCoord.xy/u_resolution.xy;
-  vec2 p=uv*2.0-1.0;p.x*=u_resolution.x/u_resolution.y;
-  vec2 m=u_mouse*2.0-1.0;m.x*=u_resolution.x/u_resolution.y;
-  float md=length(p-m);
-  float mr=sin(md*15.0-u_time*4.0)*exp(-md*3.0);p+=mr*0.08;
-  vec2 p0=p;
-  for(float i=1.0;i<4.0;i++){
-    p.x+=0.1/i*sin(i*3.0*p.y+u_time*0.4)+0.05;
-    p.y+=0.1/i*cos(i*2.0*p.x+u_time*0.3)-0.05;
-  }
-  float r=length(p);float ang=atan(p.y,p.x);
-  vec3 a=vec3(0.12,0.12,0.13);
-  vec3 b=vec3(0.03,0.04,0.05);
-  vec3 c=vec3(1.0,1.0,1.0);
-  vec3 d=vec3(0.1,0.2,0.4);
-  vec3 col=palette(r*1.5+p0.x*0.5+u_time*0.1,a,b,c,d);
-  float disp=sin(r*25.0-u_time*1.5+ang*2.0)*0.5+0.5;
-  col+=vec3(disp*0.015,disp*0.01,disp*0.02);
-  float hi=pow(sin(p.x*4.0+p.y*3.0+u_time)*0.5+0.5,8.0);
-  col+=hi*0.08;
-  vec3 base=vec3(0.05,0.05,0.06);
-  col=mix(base,col,0.85);
-  gl_FragColor=vec4(col,1.0);
-}`;
-
-const FS_LIGHT = `precision highp float;
-uniform vec2 u_resolution;uniform float u_time;uniform vec2 u_mouse;
-float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-float noise(vec2 p){
-  vec2 i=floor(p),f=fract(p);
-  float a=hash(i),b=hash(i+vec2(1,0));
-  float c=hash(i+vec2(0,1)),d=hash(i+vec2(1,1));
-  vec2 u=f*f*(3.0-2.0*f);
-  return mix(a,b,u.x)+(c-a)*u.y*(1.0-u.x)+(d-b)*u.x*u.y;
-}
-float fbm(vec2 p){
-  float v=0.0,a=0.5;
-  mat2 m=mat2(0.80,0.60,-0.60,0.80);
-  for(int i=0;i<5;i++){v+=a*noise(p);p=m*p*2.02;a*=0.5;}
-  return v;
-}
-void main(){
-  vec2 uv=gl_FragCoord.xy/u_resolution.xy;
-  vec2 p=uv;p.x*=u_resolution.x/u_resolution.y;
-  vec2 m=u_mouse;m.x*=u_resolution.x/u_resolution.y;
-  vec2 md=p-m;float dl=length(md);
-  p+=normalize(md+vec2(0.0001))*exp(-dl*5.0)*0.03;
-  vec2 q=vec2(fbm(p*1.8+u_time*0.07),fbm(p*1.8+vec2(5.2,1.3)+u_time*0.06));
-  vec2 r=vec2(fbm(p*2.0+q*1.3+vec2(1.7,9.2)+u_time*0.05),
-              fbm(p*2.0+q*1.3+vec2(8.3,2.8)+u_time*0.04));
-  float f=fbm(p*2.2+r*1.5);
-  vec3 silverDark=vec3(0.86,0.85,0.84);
-  vec3 paper=vec3(0.955,0.945,0.925);
-  vec3 col=mix(silverDark,paper,f);
-  float ph=r.x*2.2+u_time*0.35;
-  col+=vec3(0.78,0.62,0.92)*sin(ph)*0.055;
-  col+=vec3(0.55,0.72,0.95)*sin(ph*0.8+2.0)*0.05;
-  float hl=smoothstep(0.48,0.92,f);
-  col+=hl*0.06;
-  gl_FragColor=vec4(col,1.0);
-}`;
-
-const mouse={x:0.5,y:0.5};
-addEventListener('mousemove',e=>{mouse.x=e.clientX/innerWidth;mouse.y=e.clientY/innerHeight});
-
-function bootGL(canvasId, fsSrc){
-  const canvas=document.getElementById(canvasId);
-  const gl=canvas.getContext('webgl',{alpha:false,antialias:true});
-  if(!gl) return ()=>false;
-  const mk=(t,s)=>{const sh=gl.createShader(t);gl.shaderSource(sh,s);gl.compileShader(sh);return sh};
-  const prog=gl.createProgram();
-  gl.attachShader(prog,mk(gl.VERTEX_SHADER,VS));
-  gl.attachShader(prog,mk(gl.FRAGMENT_SHADER,fsSrc));
-  gl.linkProgram(prog);gl.useProgram(prog);
-  const buf=gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER,buf);
-  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
-  const pos=gl.getAttribLocation(prog,'position');
-  gl.enableVertexAttribArray(pos);gl.vertexAttribPointer(pos,2,gl.FLOAT,false,0,0);
-  const lRes=gl.getUniformLocation(prog,'u_resolution');
-  const lT=gl.getUniformLocation(prog,'u_time');
-  const lM=gl.getUniformLocation(prog,'u_mouse');
-  const resize=()=>{
-    const d=Math.min(window.devicePixelRatio||1,2);
-    canvas.width=innerWidth*d;canvas.height=innerHeight*d;
-    gl.viewport(0,0,canvas.width,canvas.height);
-  };
-  addEventListener('resize',resize);resize();
-  return (tSec)=>{
-    gl.uniform2f(lRes,canvas.width,canvas.height);
-    gl.uniform1f(lT,tSec);
-    gl.uniform2f(lM,mouse.x,1-mouse.y);
-    gl.drawArrays(gl.TRIANGLES,0,6);
-    return true;
-  };
-}
-const drawDark=bootGL('bg-dark',FS_DARK);
-const drawLight=bootGL('bg-light',FS_LIGHT);
-const t0=Date.now();
-(function loop(){
-  const t=(Date.now()-t0)/1000;
-  drawDark(t);drawLight(t);
-  requestAnimationFrame(loop);
-})();
-
-// =============== 导航（翻页 / 圆点 / 键盘 / 滚轮 / 触屏） ===============
-const deck=document.getElementById('deck');
-const slides=deck.querySelectorAll('.slide');
-const nav=document.getElementById('nav');
-let idx=0,total=slides.length,lock=false;
-
-// 关键：矫正 deck 宽度为 total * 100vw，否则翻页会错位
-deck.style.width=(total*100)+'vw';
-
-slides.forEach((s,i)=>{
-  const b=document.createElement('button');
-  b.className='dot';b.dataset.i=i;b.setAttribute('aria-label','Page '+(i+1));
-  b.onclick=()=>go(i);
-  nav.appendChild(b);
-});
-
-function go(n){
-  if(lock)return;
-  idx=Math.max(0,Math.min(total-1,n));
-  window.__deckIndex=idx;
-  deck.style.transform=`translateX(${-idx*100}vw)`;
-  nav.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===idx));
-  /* 主题切换：优先读 data-theme，其次从 class（light/dark）推断 */
-  const el=slides[idx];
-  const th=el.dataset.theme || (el.classList.contains('light')?'light':(el.classList.contains('dark')?'dark':'dark'));
-  document.body.classList.toggle('light-bg',th==='light');
-  /* 动效：翻页过渡中段触发当前页的入场动画（由 motion-boot 注册） */
-  if(window.__playSlide) setTimeout(()=>window.__playSlide(idx), 450);
-  lock=true;setTimeout(()=>lock=false,700);
-}
-
-/* =============== ESC 索引视图 =============== */
-let overviewOn=false;
-const ov=document.createElement('div');
-ov.id='overview';
-ov.style.cssText='position:fixed;inset:0;z-index:100;background:rgba(var(--ink-rgb),.92);backdrop-filter:blur(12px);display:none;overflow-y:auto;padding:4vh 4vw';
-document.body.appendChild(ov);
-
-function buildOverview(){
-  ov.innerHTML='';
-  const grid=document.createElement('div');
-  grid.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:2vh 1.6vw;max-width:90vw;margin:0 auto';
-  slides.forEach((s,i)=>{
-    const card=document.createElement('div');
-    card.style.cssText='cursor:pointer;border-radius:6px;overflow:hidden;border:2px solid '+(i===idx?'rgba(var(--paper-rgb),.8)':'rgba(var(--paper-rgb),.15)')+';transition:border-color .2s';
-    card.onmouseenter=()=>card.style.borderColor='rgba(var(--paper-rgb),.6)';
-    card.onmouseleave=()=>card.style.borderColor=i===idx?'rgba(var(--paper-rgb),.8)':'rgba(var(--paper-rgb),.15)';
-    const wrap=document.createElement('div');
-    wrap.style.cssText='width:100%;aspect-ratio:16/9;overflow:hidden;position:relative;pointer-events:none;background:'+(s.classList.contains('light')?'var(--paper)':'var(--ink)');
-    const clone=s.cloneNode(true);
-    clone.style.cssText='width:100vw;height:100vh;transform:scale('+(1/4.5)+');transform-origin:top left;position:absolute;top:0;left:0;pointer-events:none';
-    wrap.appendChild(clone);
-    const label=document.createElement('div');
-    label.style.cssText='padding:6px 10px;font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--paper);opacity:.7';
-    label.textContent=(i+1)+' / '+total;
-    card.appendChild(wrap);
-    card.appendChild(label);
-    card.onclick=()=>{toggleOverview();go(i)};
-    grid.appendChild(card);
-  });
-  ov.appendChild(grid);
-}
-
-function toggleOverview(){
-  overviewOn=!overviewOn;
-  if(overviewOn){buildOverview();ov.style.display='block';}
-  else{ov.style.display='none';}
-}
-
-addEventListener('keydown',e=>{
-  if(e.key==='Escape'){e.preventDefault();toggleOverview();return;}
-  if(overviewOn)return;
-  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '||e.key==='ArrowDown'){
-    if(window.__pipeAdvance && window.__pipeAdvance()) return;
-    go(idx+1);
-    return;
-  }
-  if(e.key==='ArrowLeft'||e.key==='PageUp'||e.key==='ArrowUp')go(idx-1);
-  if(e.key==='Home')go(0);
-  if(e.key==='End')go(total-1);
-});
-
-let wheelTO=null,wheelAcc=0;
-addEventListener('wheel',e=>{
-  wheelAcc+=e.deltaY+e.deltaX;
-  if(Math.abs(wheelAcc)>50){
-    if(wheelAcc>0 && window.__pipeAdvance && window.__pipeAdvance()){
-      wheelAcc=0;
-    }else{
-      go(idx+(wheelAcc>0?1:-1));wheelAcc=0;
-    }
-  }
-  clearTimeout(wheelTO);wheelTO=setTimeout(()=>wheelAcc=0,150);
-},{passive:true});
-
-let tx=0,ty=0;
-addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
-addEventListener('touchend',e=>{
-  const dx=(e.changedTouches[0].clientX-tx);
-  const dy=(e.changedTouches[0].clientY-ty);
-  if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){
-    if(dx<0 && window.__pipeAdvance && window.__pipeAdvance()) return;
-    go(idx+(dx<0?1:-1));
-  }
-},{passive:true});
-
-function getInitialSlide(){
-  const params=new URLSearchParams(location.search);
-  const raw=params.get('slide') || params.get('p');
-  const n=raw ? parseInt(raw,10) : 1;
-  return Number.isFinite(n) ? Math.max(0,Math.min(total-1,n-1)) : 0;
-}
-
-const initialSlide=getInitialSlide();
-if(initialSlide>0){
-  document.body.classList.add('direct-slide');
-  deck.style.transition='none';
-  go(initialSlide);
-  void deck.offsetWidth;
-  requestAnimationFrame(()=>{deck.style.transition='';});
-}else{
-  go(0);
-}
-</script>
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-<script>lucide.createIcons();</script>
-
-<!-- ============ Motion One 动效引擎（本地优先,CDN 兜底） ============
-     加载策略:先 ./assets/motion.min.js(本地,离线可用),失败 fallback 到 jsDelivr CDN
-     加载完成后挂 window.__playSlide / window.__pipeAdvance,
-     导航脚本会在翻页中段调用 __playSlide(idx),键盘/滚轮/触屏会在翻页前调用 __pipeAdvance()
-     双双失败时会兜底把所有 [data-anim] 设为可见,不让动效破坏阅读
--->
-<script type="module">
-let motion;
-try {
-  motion = await import('./assets/motion.min.js');
-} catch(e1) {
-  try {
-    motion = await import('https://cdn.jsdelivr.net/npm/motion@11.11.17/+esm');
-  } catch(e2) {
-    console.warn('[motion] local + CDN both failed, disabling animations', e1, e2);
-    document.querySelectorAll('[data-anim]').forEach(el=>{el.style.opacity='1';el.style.transform='none'});
-    document.querySelectorAll('[data-animate="pipeline"] [data-anim]').forEach(el=>el.style.opacity='1');
-  }
-}
-
-if(motion){
-  const { animate, stagger } = motion;
-  document.body.classList.add('motion-ready');
-  const EASE = [.22, 1, .36, 1];
-  const slides = [...document.querySelectorAll('.slide')];
-  let pipeStep = -1;
-  let lastIdx = -1;
-
-  function resetAnims(slide){
-    slide.querySelectorAll('[data-anim]').forEach(el=>{
-      el.style.opacity='';
-      el.style.transform='';
+  <script>
+    const deck = document.querySelector("#deck");
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const controls = document.querySelector(".controls");
+    const dots = slides.map((slide, index) => {
+      const dot = document.createElement("button");
+      dot.className = "dot";
+      dot.type = "button";
+      dot.setAttribute("aria-label", `跳转到第 ${index + 1} 页`);
+      dot.addEventListener("click", () => slide.scrollIntoView({ behavior: "smooth", inline: "start" }));
+      controls.appendChild(dot);
+      return dot;
     });
-  }
 
-  function playSlide(i){
-    const slide = slides[i];
-    if(!slide) return;
-    lastIdx = i;
-    const recipe = slide.dataset.animate || (slide.classList.contains('hero') ? 'hero' : 'cascade');
-
-    if(recipe === 'pipeline'){
-      pipeStep = -1;
-      slide.querySelectorAll('[data-anim]').forEach(el=>{
-        el.style.opacity='0.15';
-        el.style.transform='none';
-      });
-      return;
+    function activeIndex() {
+      return Math.round(deck.scrollLeft / window.innerWidth);
     }
 
-    resetAnims(slide);
-    const all = [...slide.querySelectorAll('[data-anim]')];
-    if(!all.length) return;
-
-    if(recipe === 'directional'){
-      const lefts  = all.filter(el=>el.dataset.anim==='left');
-      const divs   = all.filter(el=>el.dataset.anim==='divider');
-      const rights = all.filter(el=>el.dataset.anim==='right');
-      const others = all.filter(el=>!['left','right','divider'].includes(el.dataset.anim));
-      if(others.length) animate(others, {opacity:[0,1], y:[12,0]}, {duration:.6, delay:stagger(.1, {start:.15}), easing:EASE});
-      if(lefts.length)  animate(lefts,  {opacity:[0,1], x:[-24,0]}, {duration:.8, delay:.35, easing:EASE});
-      if(divs.length)   animate(divs,   {opacity:[0,.25]},          {duration:.5, delay:.9});
-      if(rights.length) animate(rights, {opacity:[0,1], x:[24,0]},  {duration:.8, delay:1.0, easing:EASE});
-      return;
+    function syncDots() {
+      const current = activeIndex();
+      dots.forEach((dot, index) => dot.classList.toggle("active", index === current));
     }
 
-    if(recipe === 'quote'){
-      const lines = all.filter(el=>el.dataset.anim==='line');
-      const others = all.filter(el=>el.dataset.anim!=='line');
-      if(others.length) animate(others, {opacity:[0,1], y:[8,0]},    {duration:.6, delay:stagger(.12, {start:.2}), easing:EASE});
-      if(lines.length)  animate(lines,  {opacity:[.35,1], y:[10,0]}, {duration:.8, delay:stagger(.55, {start:.5}), easing:EASE});
-      return;
+    function go(delta) {
+      const next = Math.min(slides.length - 1, Math.max(0, activeIndex() + delta));
+      slides[next].scrollIntoView({ behavior: "smooth", inline: "start" });
     }
 
-    if(recipe === 'hero'){
-      animate(all, {opacity:[0,1], y:[14,0]}, {duration:.9, delay:stagger(.16, {start:.2}), easing:EASE});
-      return;
-    }
-
-    // default: cascade
-    animate(all, {opacity:[0,1], y:[16,0]}, {duration:.75, delay:stagger(.1, {start:.15}), easing:EASE});
-  }
-
-  function pipeAdvance(){
-    const slide = slides[lastIdx];
-    if(!slide || slide.dataset.animate !== 'pipeline') return false;
-    const steps  = [...slide.querySelectorAll('[data-anim="step"]')];
-    const arrows = [...slide.querySelectorAll('[data-anim="arrow"]')];
-    if(pipeStep >= steps.length - 1) return false;
-    pipeStep++;
-    animate(steps[pipeStep], {opacity:[0.15,1], y:[8,0]}, {duration:.5, easing:EASE});
-    if(pipeStep > 0 && arrows[pipeStep-1]){
-      animate(arrows[pipeStep-1], {opacity:[0.15,.7]}, {duration:.3, delay:.15});
-    }
-    return true;
-  }
-
-  window.__playSlide = playSlide;
-  window.__pipeAdvance = pipeAdvance;
-
-  // 首屏 go() 已跑过(同步)，没来得及触发动效 → 这里补一下当前页
-  playSlide(window.__deckIndex || 0);
-}
-</script>
+    deck.addEventListener("scroll", () => window.requestAnimationFrame(syncDots), { passive: true });
+    window.addEventListener("resize", syncDots);
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " ") go(1);
+      if (event.key === "ArrowLeft" || event.key === "PageUp") go(-1);
+      if (event.key === "Home") slides[0].scrollIntoView({ behavior: "smooth", inline: "start" });
+      if (event.key === "End") slides[slides.length - 1].scrollIntoView({ behavior: "smooth", inline: "start" });
+    });
+    syncDots();
+  </script>
 </body>
 </html>

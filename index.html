@@ -256,8 +256,9 @@
 
     .source-head .lead {
       max-width: none;
-      font-size: clamp(18px, 1.5vw, 24px);
-      line-height: 1.48;
+      font-size: clamp(16px, 1.18vw, 19px);
+      line-height: 1.42;
+      white-space: nowrap;
     }
 
     .source-layout {
@@ -269,13 +270,13 @@
 
     .source-stats {
       display: grid;
-      gap: 12px;
+      gap: 10px;
       align-content: center;
     }
 
     .source-stat {
-      min-height: 112px;
-      padding: 18px 20px;
+      min-height: 96px;
+      padding: 14px 20px;
       border-left: 3px solid var(--gold);
       background: rgba(255, 253, 250, .68);
     }
@@ -283,7 +284,7 @@
     .source-stat strong {
       display: block;
       font-family: Georgia, "Times New Roman", serif;
-      font-size: 48px;
+      font-size: 42px;
       line-height: .95;
       color: var(--ink);
     }
@@ -294,6 +295,10 @@
       color: var(--muted);
       font-size: 16px;
       line-height: 1.42;
+    }
+
+    .source-stat.cost {
+      background: rgba(180, 139, 82, .09);
     }
 
     .source-visual {
@@ -709,6 +714,7 @@
       .metric-row,
       .flow { grid-template-columns: 1fr; }
       .one-line { white-space: normal; }
+      .source-head .lead { white-space: normal; }
       .hero-img { width: 100vw; opacity: .18; }
       .flow .node { min-height: auto; }
     }
@@ -781,7 +787,7 @@
             <div class="kicker">Source Materials</div>
             <h2 class="one-line">项目集的源材料已经整理完成</h2>
           </div>
-          <p class="lead">当前 10 份项目集战略文档已准备完成，并已上传至系统；下一步由各项目集负责人进入系统使用。</p>
+          <p class="lead">当前 10 份项目集战略文档已完成并上传，下一步由项目集负责人进入系统使用。</p>
         </div>
         <div class="source-layout">
           <div class="source-stats">
@@ -796,6 +802,10 @@
             <div class="source-stat">
               <strong>2</strong>
               <span>类信息源已接入方向：高层 DJ 会议纪要与外部行业资讯。</span>
+            </div>
+            <div class="source-stat cost">
+              <strong>约 1 万元</strong>
+              <span>单个项目集蒸馏 1,673 篇会议纪要所需算力成本。</span>
             </div>
           </div>
           <div class="source-visual">

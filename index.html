@@ -431,6 +431,50 @@
       padding: 6px;
     }
 
+    .flow-map-frame {
+      display: grid;
+      grid-template-columns: .62fr 1.38fr;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .flow-map-frame h2 {
+      font-size: clamp(42px, 4.6vw, 64px);
+    }
+
+    .flow-map-frame .lead {
+      max-width: 620px;
+      font-size: clamp(20px, 1.65vw, 25px);
+      line-height: 1.54;
+    }
+
+    .flow-map-figure {
+      display: block;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      box-shadow: 0 18px 42px rgba(6, 27, 52, .13);
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .flow-map-figure img {
+      display: block;
+      width: 100%;
+      max-height: 690px;
+      object-fit: contain;
+      object-position: center;
+      background: #ffffff;
+    }
+
+    .flow-map-caption {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
     .arch-figure,
     .zoom-trigger {
       position: relative;
@@ -699,6 +743,7 @@
       .grid-2,
       .grid-3,
       .architecture,
+      .flow-map-frame,
       .decision,
       .next-layout,
       .source-head,
@@ -727,7 +772,7 @@
         <h1>顶层战略 Agent 验收 1.0</h1>
         <p class="lead">请伟华验收：系统是否已经形成可用闭环，并确定下一阶段的推进方向。</p>
       </div>
-      <div class="footer"><span>验收汇报</span><span>01 / 09</span></div>
+      <div class="footer"><span>验收汇报</span><span>01 / 10</span></div>
     </section>
 
     <section class="slide">
@@ -752,7 +797,7 @@
           </div>
         </div>
       </div>
-      <div class="footer"><span>验收范围</span><span>02 / 09</span></div>
+      <div class="footer"><span>验收范围</span><span>02 / 10</span></div>
     </section>
 
     <section class="slide">
@@ -772,7 +817,25 @@
           <img src="images/transaction-ai-vs-ai-management.png" alt="事务加 AI 与 AI 加管理模式对比流程图">
         </a>
       </div>
-      <div class="footer"><span>整体架构</span><span>03 / 09</span></div>
+      <div class="footer"><span>整体架构</span><span>03 / 10</span></div>
+    </section>
+
+    <section class="slide">
+      <div class="topline"><span>User Flow Map</span><b>系统闭环</b></div>
+      <div class="frame flow-map-frame">
+        <div>
+          <div class="kicker">Closed Loop</div>
+          <h2 class="one-line tight">系统如何完成闭环</h2>
+          <p class="lead">0-1 构建与日常动态更新共用一套闭环：AI 生成建议，人做关键判断，最终回写战略文档。</p>
+        </div>
+        <div>
+          <a class="flow-map-figure zoom-trigger" href="#" data-asset="diagrams/strategy-agent-user-flow.png" data-zoom-src="diagrams/strategy-agent-user-flow.png" aria-label="放大查看顶层战略 Agent 用户使用流程图">
+            <img data-asset="diagrams/strategy-agent-user-flow.png" alt="顶层战略 Agent 用户使用流程结构图">
+          </a>
+          <p class="flow-map-caption">点击流程图可打开高清大图，查看从登录、0-1 构建到日常动态更新的完整用户路径。</p>
+        </div>
+      </div>
+      <div class="footer"><span>流程总览</span><span>04 / 10</span></div>
     </section>
 
     <section class="slide">
@@ -826,7 +889,7 @@
           </div>
         </div>
       </div>
-      <div class="footer"><span>证据基座</span><span>04 / 09</span></div>
+      <div class="footer"><span>证据基座</span><span>05 / 10</span></div>
     </section>
 
     <section class="slide">
@@ -860,7 +923,7 @@
           </a>
         </div>
       </div>
-      <div class="footer"><span>闭环证据</span><span>05 / 09</span></div>
+      <div class="footer"><span>闭环证据</span><span>06 / 10</span></div>
     </section>
 
     <section class="slide">
@@ -882,7 +945,7 @@
           <div class="node"><strong>版本回写</strong><span>形成可追溯战略文档和后续影响。</span></div>
         </div>
       </div>
-      <div class="footer"><span>边界设计</span><span>06 / 09</span></div>
+      <div class="footer"><span>边界设计</span><span>07 / 10</span></div>
     </section>
 
     <section class="slide">
@@ -912,7 +975,7 @@
           </div>
         </div>
       </div>
-      <div class="footer"><span>决策问题</span><span>07 / 09</span></div>
+      <div class="footer"><span>决策问题</span><span>08 / 10</span></div>
     </section>
 
     <section class="slide">
@@ -952,7 +1015,7 @@
           </div>
         </div>
       </div>
-      <div class="footer"><span>下一阶段</span><span>08 / 09</span></div>
+      <div class="footer"><span>下一阶段</span><span>09 / 10</span></div>
     </section>
 
     <section class="slide">
@@ -970,7 +1033,7 @@
           <p class="caption">产品截图均来自测试数据，并非正式数据；点击截图可放大查看。</p>
         </div>
       </div>
-      <div class="footer"><span>附录入口</span><span>09 / 09</span></div>
+      <div class="footer"><span>附录入口</span><span>10 / 10</span></div>
     </section>
   </main>
 

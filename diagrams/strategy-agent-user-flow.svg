@@ -1,0 +1,203 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1800 1180" width="1800" height="1180">
+  <style>
+    text { font-family: 'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Microsoft YaHei', 'Microsoft JhengHei', 'SimHei', sans-serif; }
+    .title { font-size: 34px; font-weight: 700; fill: #111827; }
+    .subtitle { font-size: 15px; fill: #5f6f84; }
+    .eyebrow { font-size: 12px; letter-spacing: 2px; font-weight: 700; fill: #5f6f84; }
+    .lane-title { font-size: 24px; font-weight: 700; fill: #111827; }
+    .lane-sub { font-size: 14px; fill: #5f6f84; }
+    .node-title { font-size: 18px; font-weight: 700; fill: #111827; }
+    .node-sub { font-size: 13px; fill: #5f6f84; }
+    .node-index { font-size: 13px; font-weight: 700; fill: #ffffff; }
+    .tag { font-size: 12px; font-weight: 700; }
+    .legend { font-size: 13px; fill: #5f6f84; }
+  </style>
+  <defs>
+    <marker id="arrow-blue" markerWidth="12" markerHeight="9" refX="10" refY="4.5" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L12,4.5 L0,9 Z" fill="#2563eb"/></marker>
+    <marker id="arrow-green" markerWidth="12" markerHeight="9" refX="10" refY="4.5" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L12,4.5 L0,9 Z" fill="#16a34a"/></marker>
+    <marker id="arrow-orange" markerWidth="12" markerHeight="9" refX="10" refY="4.5" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L12,4.5 L0,9 Z" fill="#ea580c"/></marker>
+    <marker id="arrow-purple" markerWidth="12" markerHeight="9" refX="10" refY="4.5" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L12,4.5 L0,9 Z" fill="#9333ea"/></marker>
+    <linearGradient id="header-grad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f8fafc"/>
+      <stop offset="1" stop-color="#fff7ed"/>
+    </linearGradient>
+  </defs>
+  <rect width="1800" height="1180" fill="#ffffff"/>
+
+<rect x="44" y="36" width="1712" height="118" rx="18" fill="url(#header-grad)" stroke="#e5e7eb" stroke-width="1.4"/>
+<text x="78" y="76" class="eyebrow">USER FLOW MAP</text>
+<text x="78" y="116" class="title">顶层战略 Agent 用户使用流程结构图</text>
+<text x="1180" y="82" class="subtitle">覆盖：从 0 到 1 构建 / 日常动态更新 / 人工验收闭环</text>
+<text x="1180" y="112" class="subtitle">原则：AI 生成建议，人负责关键判断；所有输入与结论可追溯。</text>
+<rect x="80" y="188" width="1640" height="92" rx="18" fill="#ffffff" stroke="#d1d5db" stroke-width="1.4"/>
+<rect x="130" y="205" width="300" height="58" rx="14" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.6"/>
+<circle cx="158" cy="235" r="16" fill="#2563eb"/>
+<text x="158" y="240" text-anchor="middle" class="node-index">1</text>
+<text x="186" y="239" class="node-title">登录入口</text>
+<rect x="354" y="220" width="58" height="30" rx="15" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.2"/>
+<text x="383.0" y="240" text-anchor="middle" class="tag" fill="#2563eb">用户</text>
+<text x="158" y="269" class="node-sub">进入生产系统，完成账号登录</text>
+<rect x="510" y="205" width="300" height="58" rx="14" fill="#f9fafb" stroke="#d1d5db" stroke-width="1.6"/>
+<circle cx="538" cy="235" r="16" fill="#2563eb"/>
+<text x="538" y="240" text-anchor="middle" class="node-index">2</text>
+<text x="566" y="239" class="node-title">仪表盘总览</text>
+<rect x="734" y="220" width="58" height="30" rx="15" fill="#ffffff" stroke="#d1d5db" stroke-width="1.2"/>
+<text x="763.0" y="240" text-anchor="middle" class="tag" fill="#2563eb">入口</text>
+<text x="538" y="269" class="node-sub">查看战略文档、构建状态与日更状态</text>
+<rect x="890" y="205" width="300" height="58" rx="14" fill="#f9fafb" stroke="#d1d5db" stroke-width="1.6"/>
+<circle cx="918" cy="235" r="16" fill="#ea580c"/>
+<text x="918" y="240" text-anchor="middle" class="node-index">3</text>
+<text x="946" y="239" class="node-title">选择工作路径</text>
+<rect x="1114" y="220" width="58" height="30" rx="15" fill="#ffffff" stroke="#d1d5db" stroke-width="1.2"/>
+<text x="1143.0" y="240" text-anchor="middle" class="tag" fill="#ea580c">判断</text>
+<text x="918" y="269" class="node-sub">新建构建或进入日常动态更新</text>
+<rect x="1270" y="205" width="300" height="58" rx="14" fill="#f0fdfa" stroke="#99f6e4" stroke-width="1.6"/>
+<circle cx="1298" cy="235" r="16" fill="#0f766e"/>
+<text x="1298" y="240" text-anchor="middle" class="node-index">4</text>
+<text x="1326" y="239" class="node-title">进入文档空间</text>
+<rect x="1494" y="220" width="58" height="30" rx="15" fill="#ffffff" stroke="#99f6e4" stroke-width="1.2"/>
+<text x="1523.0" y="240" text-anchor="middle" class="tag" fill="#0f766e">空间</text>
+<text x="1298" y="269" class="node-sub">围绕项目集战略文档持续工作</text>
+<line x1="430" y1="234" x2="500" y2="234" stroke="#2563eb" stroke-width="2.2" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<line x1="810" y1="234" x2="880" y2="234" stroke="#2563eb" stroke-width="2.2" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<line x1="1190" y1="234" x2="1260" y2="234" stroke="#2563eb" stroke-width="2.2" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<rect x="70" y="326" width="820" height="650" rx="20" fill="#f8fbff" stroke="#e5e7eb" stroke-width="1.5"/>
+<rect x="70" y="326" width="8" height="650" rx="4" fill="#2563eb"/>
+<text x="98" y="368" class="lane-title">路径 A：从 0 到 1 构建</text>
+<text x="98" y="394" class="lane-sub">适用于新项目集战略文档首次进入系统，从源材料逐步形成正式版本。</text>
+<rect x="910" y="326" width="820" height="650" rx="20" fill="#fbfffc" stroke="#e5e7eb" stroke-width="1.5"/>
+<rect x="910" y="326" width="8" height="650" rx="4" fill="#16a34a"/>
+<text x="938" y="368" class="lane-title">路径 B：日常动态更新</text>
+<text x="938" y="394" class="lane-sub">适用于已启用日更的战略文档，把新会议与外部信息转成可审阅的变更建议。</text>
+<path d="M1040 280 C1040 305 520 302 520 326" fill="none" stroke="#2563eb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<path d="M1040 280 C1040 305 1320 302 1320 326" fill="none" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-green)"/>
+<rect x="105" y="420" width="350" height="112" rx="14" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.6"/>
+<circle cx="133" cy="450" r="16" fill="#2563eb"/>
+<text x="133" y="455" text-anchor="middle" class="node-index">A1</text>
+<text x="161" y="454" class="node-title">上传材料并开始构建</text>
+<rect x="363" y="435" width="74" height="30" rx="15" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.2"/>
+<text x="400.0" y="455" text-anchor="middle" class="tag" fill="#2563eb">用户操作</text>
+<text x="133" y="484" class="node-sub">上传会议纪要、战略材料、项目背景。</text>
+<text x="133" y="506" class="node-sub">系统创建 Build Session 并进入后台队列。</text>
+<rect x="500" y="420" width="350" height="112" rx="14" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.6"/>
+<circle cx="528" cy="450" r="16" fill="#2563eb"/>
+<text x="528" y="455" text-anchor="middle" class="node-index">A2</text>
+<text x="556" y="454" class="node-title">AI 解析并生成方向</text>
+<rect x="758" y="435" width="74" height="30" rx="15" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.2"/>
+<text x="795.0" y="455" text-anchor="middle" class="tag" fill="#2563eb">系统自动</text>
+<text x="528" y="484" class="node-sub">文件解析、内容理解、生成战略方向草案。</text>
+<text x="528" y="506" class="node-sub">页面展示进度，失败可重试。</text>
+<rect x="105" y="570" width="350" height="112" rx="14" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.6"/>
+<circle cx="133" cy="600" r="16" fill="#ea580c"/>
+<text x="133" y="605" text-anchor="middle" class="node-index">A3</text>
+<text x="161" y="604" class="node-title">确认方向并排序</text>
+<rect x="363" y="585" width="74" height="30" rx="15" fill="#ffffff" stroke="#fed7aa" stroke-width="1.2"/>
+<text x="400.0" y="605" text-anchor="middle" class="tag" fill="#ea580c">用户判断</text>
+<text x="133" y="634" class="node-sub">逐条通过、不通过或需调整。</text>
+<text x="133" y="656" class="node-sub">全部处理后拖拽排序并确认。</text>
+<rect x="500" y="570" width="350" height="112" rx="14" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.6"/>
+<circle cx="528" cy="600" r="16" fill="#2563eb"/>
+<text x="528" y="605" text-anchor="middle" class="node-index">A4</text>
+<text x="556" y="604" class="node-title">生成维度与观点</text>
+<rect x="744" y="585" width="88" height="30" rx="15" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.2"/>
+<text x="788.0" y="605" text-anchor="middle" class="tag" fill="#2563eb">AI 生成</text>
+<text x="528" y="634" class="node-sub">方向确认后生成维度；维度确认后生成观点。</text>
+<text x="528" y="656" class="node-sub">需调整会触发局部重新生成。</text>
+<rect x="105" y="720" width="350" height="112" rx="14" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.6"/>
+<circle cx="133" cy="750" r="16" fill="#ea580c"/>
+<text x="133" y="755" text-anchor="middle" class="node-index">A5</text>
+<text x="161" y="754" class="node-title">逐层确认结构</text>
+<rect x="363" y="735" width="74" height="30" rx="15" fill="#ffffff" stroke="#fed7aa" stroke-width="1.2"/>
+<text x="400.0" y="755" text-anchor="middle" class="tag" fill="#ea580c">用户判断</text>
+<text x="133" y="784" class="node-sub">按方向、维度、观点逐层审阅。</text>
+<text x="133" y="806" class="node-sub">用户决定保留、拒绝或调整。</text>
+<rect x="500" y="720" width="350" height="112" rx="14" fill="#faf5ff" stroke="#e9d5ff" stroke-width="1.6"/>
+<circle cx="528" cy="750" r="16" fill="#9333ea"/>
+<text x="528" y="755" text-anchor="middle" class="node-index">A6</text>
+<text x="556" y="754" class="node-title">专家评审与最终发布</text>
+<rect x="774" y="735" width="58" height="30" rx="15" fill="#ffffff" stroke="#e9d5ff" stroke-width="1.2"/>
+<text x="803.0" y="755" text-anchor="middle" class="tag" fill="#9333ea">闭环</text>
+<text x="528" y="784" class="node-sub">识别领域、创建专家、讨论、生成报告。</text>
+<text x="528" y="806" class="node-sub">最终审阅后发布为正式战略文档。</text>
+<line x1="455" y1="476" x2="490" y2="476" stroke="#2563eb" stroke-width="2.2" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M675 532 L675 550 C675 562 455 562 455 585" fill="none" stroke="#ea580c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-orange)"/>
+<line x1="455" y1="626" x2="490" y2="626" stroke="#2563eb" stroke-width="2.2" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M675 682 L675 700 C675 712 455 712 455 735" fill="none" stroke="#ea580c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-orange)"/>
+<line x1="455" y1="776" x2="490" y2="776" stroke="#9333ea" stroke-width="2.2" stroke-linecap="round" marker-end="url(#arrow-purple)"/>
+<path d="M675 832 C675 900 815 920 900 1006" fill="none" stroke="#9333ea" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-purple)" stroke-dasharray="8 8"/>
+<rect x="945" y="420" width="350" height="112" rx="14" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.6"/>
+<circle cx="973" cy="450" r="16" fill="#16a34a"/>
+<text x="973" y="455" text-anchor="middle" class="node-index">B1</text>
+<text x="1001" y="454" class="node-title">触发日常更新</text>
+<rect x="1189" y="435" width="88" height="30" rx="15" fill="#ffffff" stroke="#bbf7d0" stroke-width="1.2"/>
+<text x="1233.0" y="455" text-anchor="middle" class="tag" fill="#16a34a">用户/定时</text>
+<text x="973" y="484" class="node-sub">用户选择日期手动触发；也可由定时任务触发。</text>
+<text x="973" y="506" class="node-sub">系统创建 Daily Update Job。</text>
+<rect x="1340" y="420" width="350" height="112" rx="14" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.6"/>
+<circle cx="1368" cy="450" r="16" fill="#16a34a"/>
+<text x="1368" y="455" text-anchor="middle" class="node-index">B2</text>
+<text x="1396" y="454" class="node-title">抓取新会议与外部信息</text>
+<rect x="1598" y="435" width="74" height="30" rx="15" fill="#ffffff" stroke="#bbf7d0" stroke-width="1.2"/>
+<text x="1635.0" y="455" text-anchor="middle" class="tag" fill="#16a34a">系统自动</text>
+<text x="1368" y="484" class="node-sub">抓取会议纪要，按启用日更的文档展开分析。</text>
+<text x="1368" y="506" class="node-sub">必要时补充外部行业资讯。</text>
+<rect x="945" y="570" width="350" height="112" rx="14" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.6"/>
+<circle cx="973" cy="600" r="16" fill="#16a34a"/>
+<text x="973" y="605" text-anchor="middle" class="node-index">B3</text>
+<text x="1001" y="604" class="node-title">分析影响范围</text>
+<rect x="1189" y="585" width="88" height="30" rx="15" fill="#ffffff" stroke="#bbf7d0" stroke-width="1.2"/>
+<text x="1233.0" y="605" text-anchor="middle" class="tag" fill="#16a34a">AI 分析</text>
+<text x="973" y="634" class="node-sub">逐篇会议 x 逐份文档判断相关性。</text>
+<text x="973" y="656" class="node-sub">输出新增、修改、删除等影响摘要。</text>
+<rect x="1340" y="570" width="350" height="112" rx="14" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.6"/>
+<circle cx="1368" cy="600" r="16" fill="#16a34a"/>
+<text x="1368" y="605" text-anchor="middle" class="node-index">B4</text>
+<text x="1396" y="604" class="node-title">合并变更建议</text>
+<rect x="1584" y="585" width="88" height="30" rx="15" fill="#ffffff" stroke="#bbf7d0" stroke-width="1.2"/>
+<text x="1628.0" y="605" text-anchor="middle" class="tag" fill="#16a34a">AI 合并</text>
+<text x="1368" y="634" class="node-sub">把多条分析归并为每份文档的建议清单。</text>
+<text x="1368" y="656" class="node-sub">生成可追溯的 Merged Proposal。</text>
+<rect x="945" y="720" width="350" height="112" rx="14" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.6"/>
+<circle cx="973" cy="750" r="16" fill="#ea580c"/>
+<text x="973" y="755" text-anchor="middle" class="node-index">B5</text>
+<text x="1001" y="754" class="node-title">逐条审阅建议</text>
+<rect x="1203" y="735" width="74" height="30" rx="15" fill="#ffffff" stroke="#fed7aa" stroke-width="1.2"/>
+<text x="1240.0" y="755" text-anchor="middle" class="tag" fill="#ea580c">用户判断</text>
+<text x="973" y="784" class="node-sub">按方向分组查看，逐条采纳、拒绝或调整。</text>
+<text x="973" y="806" class="node-sub">未完成审阅前不回写正式文档。</text>
+<rect x="1340" y="720" width="350" height="112" rx="14" fill="#faf5ff" stroke="#e9d5ff" stroke-width="1.6"/>
+<circle cx="1368" cy="750" r="16" fill="#9333ea"/>
+<text x="1368" y="755" text-anchor="middle" class="node-index">B6</text>
+<text x="1396" y="754" class="node-title">提交并形成新版本</text>
+<rect x="1614" y="735" width="58" height="30" rx="15" fill="#ffffff" stroke="#e9d5ff" stroke-width="1.2"/>
+<text x="1643.0" y="755" text-anchor="middle" class="tag" fill="#9333ea">回写</text>
+<text x="1368" y="784" class="node-sub">采纳项写入文档结构并创建版本。</text>
+<text x="1368" y="806" class="node-sub">可触发或进入专家复核，通知相关负责人。</text>
+<line x1="1295" y1="476" x2="1330" y2="476" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" marker-end="url(#arrow-green)"/>
+<path d="M1515 532 L1515 550 C1515 562 1295 562 1295 585" fill="none" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-green)"/>
+<line x1="1295" y1="626" x2="1330" y2="626" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" marker-end="url(#arrow-green)"/>
+<path d="M1515 682 L1515 700 C1515 712 1295 712 1295 735" fill="none" stroke="#ea580c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-orange)"/>
+<line x1="1295" y1="776" x2="1330" y2="776" stroke="#9333ea" stroke-width="2.2" stroke-linecap="round" marker-end="url(#arrow-purple)"/>
+<path d="M1515 832 C1515 900 1170 930 1040 1006" fill="none" stroke="#9333ea" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-purple)" stroke-dasharray="8 8"/>
+<rect x="360" y="1010" width="1080" height="104" rx="18" fill="#ffffff" stroke="#d1d5db" stroke-width="1.5"/>
+<text x="390" y="1050" class="lane-title">共同产出：可追溯战略文档与下游管理信号</text>
+<text x="390" y="1078" class="lane-sub">战略文档库、术语库、来源证据、通知与版本记录持续沉淀；后续可把战略变化传递给意图识别与分发 Agent，再进入 AI 项目管理闭环。</text>
+<rect x="1180" y="1032" width="98" height="30" rx="15" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.2"/>
+<text x="1229.0" y="1052" text-anchor="middle" class="tag" fill="#2563eb">文档版本</text>
+<rect x="1290" y="1032" width="98" height="30" rx="15" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.2"/>
+<text x="1339.0" y="1052" text-anchor="middle" class="tag" fill="#16a34a">来源追溯</text>
+<rect x="1400" y="1032" width="118" height="30" rx="15" fill="#faf5ff" stroke="#e9d5ff" stroke-width="1.2"/>
+<text x="1459.0" y="1052" text-anchor="middle" class="tag" fill="#9333ea">下游信号</text>
+<path d="M900 1010 C860 940 845 320 660 280" fill="none" stroke="#9333ea" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-purple)" stroke-dasharray="8 8"/>
+<rect x="105" y="885" width="350" height="58" rx="12" fill="#ffffff" stroke="#d1d5db" stroke-width="1.2"/>
+<text x="128" y="914" class="node-sub"><tspan font-weight="700" fill="#111827">关键控制点：</tspan>方向、维度、观点都必须由人确认后继续推进。</text>
+<rect x="1340" y="885" width="350" height="58" rx="12" fill="#ffffff" stroke="#d1d5db" stroke-width="1.2"/>
+<text x="1363" y="914" class="node-sub"><tspan font-weight="700" fill="#111827">验收口径：</tspan>建议清单审完并提交，才会回写成新版本。</text>
+<g transform="translate(78, 1128)">
+<line x1="0" y1="0" x2="42" y2="0" stroke="#2563eb" stroke-width="2.2" marker-end="url(#arrow-blue)"/><text x="54" y="5" class="legend">0-1 构建主线</text>
+<line x1="190" y1="0" x2="232" y2="0" stroke="#16a34a" stroke-width="2.2" marker-end="url(#arrow-green)"/><text x="244" y="5" class="legend">日更主线</text>
+<line x1="342" y1="0" x2="384" y2="0" stroke="#ea580c" stroke-width="2.2" marker-end="url(#arrow-orange)"/><text x="396" y="5" class="legend">人工判断</text>
+<line x1="520" y1="0" x2="562" y2="0" stroke="#9333ea" stroke-width="2.2" stroke-dasharray="8 8" marker-end="url(#arrow-purple)"/><text x="574" y="5" class="legend">版本回写/反馈闭环</text>
+</g>
+<text x="1430" y="1133" class="legend">依据：生产入口观察 + build/daily-update pipeline 代码</text>
+</svg>

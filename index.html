@@ -239,6 +239,122 @@
       line-height: 1.45;
     }
 
+    .source-frame {
+      gap: 20px;
+    }
+
+    .source-head {
+      display: grid;
+      grid-template-columns: 1.08fr .92fr;
+      gap: 28px;
+      align-items: end;
+    }
+
+    .source-head h2 {
+      font-size: clamp(34px, 3.4vw, 52px);
+    }
+
+    .source-head .lead {
+      max-width: none;
+      font-size: clamp(18px, 1.5vw, 24px);
+      line-height: 1.48;
+    }
+
+    .source-layout {
+      display: grid;
+      grid-template-columns: .36fr .64fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .source-stats {
+      display: grid;
+      gap: 12px;
+      align-content: center;
+    }
+
+    .source-stat {
+      min-height: 112px;
+      padding: 18px 20px;
+      border-left: 3px solid var(--gold);
+      background: rgba(255, 253, 250, .68);
+    }
+
+    .source-stat strong {
+      display: block;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 48px;
+      line-height: .95;
+      color: var(--ink);
+    }
+
+    .source-stat span {
+      display: block;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.42;
+    }
+
+    .source-visual {
+      display: grid;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .source-shot {
+      display: block;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      box-shadow: 0 18px 42px rgba(6, 27, 52, .13);
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .source-shot img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 8.8;
+      object-fit: contain;
+      object-position: center;
+      background: #f7f9fc;
+    }
+
+    .source-caption {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .source-proof-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .source-proof {
+      min-height: 104px;
+      padding: 18px 20px;
+      border: 1px solid var(--line);
+      border-top: 2px solid var(--gold);
+      border-radius: 8px;
+      background: rgba(251, 250, 246, .86);
+    }
+
+    .source-proof h3 {
+      margin-bottom: 6px;
+      font-size: 20px;
+      line-height: 1.25;
+    }
+
+    .source-proof p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
     .evidence-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -584,6 +700,9 @@
       .architecture,
       .decision,
       .next-layout,
+      .source-head,
+      .source-layout,
+      .source-proof-row,
       .path-steps,
       .roadmap-strip,
       .evidence-grid,
@@ -656,32 +775,46 @@
 
     <section class="slide">
       <div class="topline"><span>Evidence Base</span><b>输入基座</b></div>
-      <div class="frame">
-        <h2 class="one-line fit">项目集的源材料已经整理完成</h2>
-        <div class="metric-row">
-          <div class="metric">
-            <strong>1,673</strong>
-            <span>篇会议纪要已完成项目相关性蒸馏，覆盖 2025-01-01 至 2026-05-13。</span>
+      <div class="frame source-frame">
+        <div class="source-head">
+          <div>
+            <div class="kicker">Source Materials</div>
+            <h2 class="one-line">项目集的源材料已经整理完成</h2>
           </div>
-          <div class="metric">
-            <strong>10</strong>
-            <span>份项目集战略文档进入系统，构成独立战略空间。</span>
+          <p class="lead">本页只证明一件事：10 个项目集的战略空间已经进入系统，可以继续承接构建、日更和后续下游管理闭环。</p>
+        </div>
+        <div class="source-layout">
+          <div class="source-stats">
+            <div class="source-stat">
+              <strong>1,673</strong>
+              <span>篇会议纪要完成项目相关性蒸馏，覆盖 2025-01-01 至 2026-05-13。</span>
+            </div>
+            <div class="source-stat">
+              <strong>10</strong>
+              <span>份项目集战略文档进入系统，构成独立战略空间。</span>
+            </div>
+            <div class="source-stat">
+              <strong>2</strong>
+              <span>类信息源已接入方向：高层 DJ 会议纪要与外部行业资讯。</span>
+            </div>
           </div>
-          <div class="metric">
-            <strong>2</strong>
-            <span>类信息源已接入方向：高层 DJ 会议纪要与外部行业资讯。</span>
+          <div class="source-visual">
+            <a class="source-shot zoom-trigger" href="#" data-asset="screenshots-hd/30-source-materials-dashboard.png" data-zoom-src="screenshots-hd/30-source-materials-dashboard.png" aria-label="放大查看项目集源材料截图">
+              <img data-asset="screenshots-hd/30-source-materials-dashboard.png" alt="项目集源材料截图">
+            </a>
+            <p class="source-caption">产品截图均来自测试数据并非正式数据，点击截图可放大查看 10 个项目集战略空间。</p>
           </div>
         </div>
-        <div class="grid-3">
-          <div class="card">
+        <div class="source-proof-row">
+          <div class="source-proof">
             <h3>输入可追溯</h3>
             <p>每个观点都应能回到具体会议、行业资讯或专家建议，避免战略文档变成不可追问的摘要。</p>
           </div>
-          <div class="card">
+          <div class="source-proof">
             <h3>更新可持续</h3>
             <p>新会议与外部变化可以持续进入日常更新流程，推动战略文档动态变化。</p>
           </div>
-          <div class="card">
+          <div class="source-proof">
             <h3>空间可扩展</h3>
             <p>每个项目集形成独立战略空间，后续可汇总为非游业务整体战略文档。</p>
           </div>
